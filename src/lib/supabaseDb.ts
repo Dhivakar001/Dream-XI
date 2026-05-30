@@ -94,9 +94,14 @@ export async function loadSquadsFromCloud(userId?: string): Promise<Squad[]> {
       query = query.eq('user_id', userId);
     }
 
-    const { data, error } = await query.order('created_at', { ascending: false });
+    const queryPromise = query.order('created_at', { ascending: false });
+    const timeoutPromise = new Promise<{ data: any; error: any }>((resolve) => {
+      setTimeout(() => resolve({ error: new Error('loadSquadsFromCloud request timed out'), data: null }), 1200);
+    });
+
+    const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
     if (error || !data) {
-      console.warn('Supabase squads retrieve warning:', error?.message);
+      console.warn('Supabase squads retrieve warning or timeout:', error?.message);
       return [];
     }
 

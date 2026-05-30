@@ -43,20 +43,29 @@ export default function BattleArena({
   useEffect(() => {
     if (!activeBattleId) return;
 
+    let ignore = false;
     const fetchComments = async () => {
       setLoadingComments(true);
       try {
         const res = await fetch(`/api/comments/${activeBattleId}`);
+        if (ignore) return;
         const data = await res.json();
         setActiveComments(data);
       } catch (err) {
+        if (ignore) return;
         console.error('Failed to load active discussion comment threads', err);
       } finally {
-        setLoadingComments(false);
+        if (!ignore) {
+          setLoadingComments(false);
+        }
       }
     };
 
     fetchComments();
+
+    return () => {
+      ignore = true;
+    };
   }, [activeBattleId]);
 
   const castVote = async (battleId: string, team: 'A' | 'B') => {

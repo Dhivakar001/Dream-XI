@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Play, RotateCcw, CupSoda, Trophy, User, ShieldAlert, Zap, Timer, BarChart2, Star } from 'lucide-react';
 import { Squad, MatchEvent, SimulationResult, Player } from '../types';
@@ -17,8 +17,10 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
   const [minutes, setMinutes] = useState(0);
   const [visibleEvents, setVisibleEvents] = useState<MatchEvent[]>([]);
 
-  // Filter opponent lists (non-user)
-  const availableOpponents = savedSquads.filter(s => s.id !== userSquad?.id || s.userId === 'u-pele');
+  // Filter opponent lists (non-user) and stabilize reference with useMemo
+  const availableOpponents = useMemo(() => {
+    return savedSquads.filter(s => s.id !== userSquad?.id || s.userId === 'u-pele');
+  }, [savedSquads, userSquad?.id]);
 
   useEffect(() => {
     if (availableOpponents.length > 0 && !selectedOpponentId) {

@@ -9,48 +9,73 @@ export function useAuth() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string, email: string) => {
+  const fetchProfile = async (userId: string, email: string, userObj?: any) => {
     try {
-      const { data, error } = await supabase
+      const meta = userObj?.user_metadata || {};
+      const joinDate = userObj?.created_at ? new Date(userObj.created_at).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }) : new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long'
+      });
+
+      const getProfilePromise = supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
 
+      const timeoutPromise = new Promise<{ data: any; error: any }>((resolve) => {
+        setTimeout(() => resolve({ error: new Error('Profile query timed out'), data: null }), 1200);
+      });
+
+      const { data, error } = await Promise.race([getProfilePromise, timeoutPromise]);
+
       if (error || !data) {
-        console.warn('Profile mismatch or not yet persistent in trigger. Auto-creating client side fallback profile:', error);
+        console.warn('Profile mismatch, timeout or not yet persistent in trigger. Auto-creating client side fallback profile:', error);
         
         // Let's attempt to insert the fallback profile directly if DB trigger didn't execute yet
         const fallbackProfile: UserProfile = {
           id: userId,
-          username: email.split('@')[0],
+          username: meta.username || email.split('@')[0],
           email: email,
-          favoriteClub: 'Real Madrid',
+          favoriteClub: meta.favorite_club || 'Real Madrid',
           winRate: 50,
           footballIQ: 100,
           followers: 0,
           following: 0,
           badges: ['Rookie Builder'],
           squadsCount: 0,
-          bio: 'New Dream XI Gaffer!'
+          bio: meta.bio || 'New Dream XI Gaffer!',
+          avatar: meta.avatar || '👑',
+          favoritePlayer: meta.favorite_player || 'Cristiano Ronaldo',
+          createdAt: joinDate
         };
 
-        const { data: insertedData } = await supabase
+        const insertPromise = supabase
           .from('profiles')
           .insert({
             id: userId,
-            username: email.split('@')[0],
-            favorite_club: 'Real Madrid',
+            username: meta.username || email.split('@')[0],
+            favorite_club: meta.favorite_club || 'Real Madrid',
             win_rate: 50,
             football_iq: 100,
             followers: 0,
             following: 0,
-            bio: 'New Dream XI Gaffer!',
+            bio: meta.bio || 'New Dream XI Gaffer!',
             badges: ['Rookie Builder'],
             squads_count: 0
           })
           .select()
           .single();
+
+        const insertTimeoutPromise = new Promise<{ data: any; error: any }>((resolve) => {
+          setTimeout(() => resolve({ error: new Error('Insert profile request timed out'), data: null }), 1200);
+        });
+
+        const { data: insertedData } = await Promise.race([insertPromise, insertTimeoutPromise]);
 
         if (insertedData) {
           setProfile({
@@ -64,7 +89,10 @@ export function useAuth() {
             following: insertedData.following,
             badges: insertedData.badges || ['Rookie Builder'],
             squadsCount: insertedData.squads_count,
-            bio: insertedData.bio
+            bio: insertedData.bio,
+            avatar: meta.avatar || '👑',
+            favoritePlayer: meta.favorite_player || 'Cristiano Ronaldo',
+            createdAt: joinDate
           });
         } else {
           setProfile(fallbackProfile);
@@ -81,7 +109,10 @@ export function useAuth() {
           following: data.following,
           badges: data.badges || ['Rookie Builder'],
           squadsCount: data.squads_count,
-          bio: data.bio
+          bio: data.bio,
+          avatar: meta.avatar || '👑',
+          favoritePlayer: meta.favorite_player || 'Cristiano Ronaldo',
+          createdAt: joinDate
         });
       }
     } catch (e) {
@@ -90,24 +121,50 @@ export function useAuth() {
   };
 
   useEffect(() => {
+    let active = true;
+
     // Sync initial session status
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id, session.user.email ?? '');
-      } else {
-        setProfile(null);
+    const initAuth = async () => {
+      try {
+        const getSessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise<any>((resolve) => {
+          setTimeout(() => resolve({ data: { session: null }, timedOut: true }), 1200);
+        });
+
+        const { data: { session }, timedOut } = await Promise.race([getSessionPromise, timeoutPromise]);
+        
+        if (!active) return;
+
+        if (timedOut) {
+          console.warn('Supabase getSession timed out, continuing with guest/local profile.');
+        }
+
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          await fetchProfile(session.user.id, session.user.email ?? '', session.user);
+        } else {
+          setProfile(null);
+        }
+      } catch (err) {
+        console.error('Error during initAuth setup:', err);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
-      setLoading(false);
-    });
+    };
+
+    initAuth();
 
     // Handle authentication state modifications
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!active) return;
+
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        await fetchProfile(session.user.id, session.user.email ?? '');
+        await fetchProfile(session.user.id, session.user.email ?? '', session.user);
       } else {
         setProfile(null);
       }
@@ -115,6 +172,7 @@ export function useAuth() {
     });
 
     return () => {
+      active = false;
       subscription.unsubscribe();
     };
   }, []);

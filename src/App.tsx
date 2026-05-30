@@ -15,7 +15,8 @@ import {
   Tv,
   MessageCircle,
   TrendingUp,
-  Share2
+  Share2,
+  ShieldAlert
 } from 'lucide-react';
 
 import { Player, Squad, Battle, SocialPost, UserProfile } from './types';
@@ -38,8 +39,11 @@ import LegendsDatabase from './components/LegendsDatabase';
 import UserProfileView from './components/UserProfileView';
 import LeaderboardsView from './components/LeaderboardsView';
 import HolographicCard from './components/HolographicCard';
+import UserDropdown from './components/UserDropdown';
+import ProtectedRoute from './components/ProtectedRoute';
+import MySquadsView from './components/MySquadsView';
 
-type TabName = 'builder' | 'simulator' | 'arena' | 'feed' | 'database' | 'profile' | 'leaderboards';
+type TabName = 'builder' | 'simulator' | 'arena' | 'feed' | 'database' | 'profile' | 'leaderboards' | 'my-squads' | 'settings';
 
 // Demo top stars for the floating hero showcase
 const HERO_SHOWCASE_PLAYERS: Player[] = [
@@ -100,7 +104,7 @@ const HERO_SHOWCASE_PLAYERS: Player[] = [
 ];
 
 export default function App() {
-  const { user, profile: authProfile, loading: authLoading } = useAuth();
+  const { user, profile: authProfile, loading: authLoading, setProfile: setAuthProfile } = useAuth();
   const [authScreen, setAuthScreen] = useState<'login' | 'signup'>('login');
 
   const [activeTab, setActiveTab] = useState<TabName>('builder');
@@ -112,6 +116,7 @@ export default function App() {
   const [battles, setBattles] = useState<Battle[]>([]);
   const [feedPosts, setFeedPosts] = useState<SocialPost[]>([]);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Active sandbox entities
   const [activeSquad, setActiveSquad] = useState<Squad | undefined>(undefined);
@@ -178,52 +183,87 @@ export default function App() {
 
   // Load all telemetry endpoints concurrently on startup
   useEffect(() => {
+    let ignore = false;
     const loadInitialData = async () => {
-      try {
-        const [resPlayers, resSquads, resBattles, resFeed, resProfile] = await Promise.all([
-          fetch('/api/players'),
-          fetch('/api/squads'),
-          fetch('/api/battles'),
-          fetch('/api/feed'),
-          fetch('/api/profile'),
-        ]);
+      setLoading(true);
+      setError(null);
+      let attempts = 0;
+      const maxAttempts = 6;
+      let delay = 1000;
 
-        const [players, squads, battlesList, feed, userProfile] = await Promise.all([
-          resPlayers.json(),
-          resSquads.json(),
-          resBattles.json(),
-          resFeed.json(),
-          resProfile.json(),
-        ]);
+      while (attempts < maxAttempts) {
+        try {
+          if (ignore) return;
+          const [resPlayers, resSquads, resBattles, resFeed, resProfile] = await Promise.all([
+            fetch('/api/players'),
+            fetch('/api/squads'),
+            fetch('/api/battles'),
+            fetch('/api/feed'),
+            fetch('/api/profile'),
+          ]);
 
-        setAvailablePlayers(players);
-        
-        if (user) {
-          try {
-            const cloudSquads = await loadSquadsFromCloud(user.id);
-            const mergedSquads = [
-              ...cloudSquads,
-              ...squads.filter((s: Squad) => !cloudSquads.some(cs => cs.id === s.id))
-            ];
-            setSquadsList(mergedSquads);
-          } catch (cloudErr) {
-            console.warn('Could not integrate cloud squads, using seed squads:', cloudErr);
+          if (!resPlayers.ok || !resSquads.ok || !resBattles.ok || !resFeed.ok || !resProfile.ok) {
+            throw new Error(`Non-ok API response received (Players: ${resPlayers.status}, Squads: ${resSquads.status}, Battles: ${resBattles.status})`);
+          }
+
+          if (ignore) return;
+
+          const [players, squads, battlesList, feed, userProfile] = await Promise.all([
+            resPlayers.json(),
+            resSquads.json(),
+            resBattles.json(),
+            resFeed.json(),
+            resProfile.json(),
+          ]);
+
+          if (ignore) return;
+
+          setAvailablePlayers(players);
+          
+          if (user) {
+            try {
+              const cloudSquads = await loadSquadsFromCloud(user.id);
+              if (ignore) return;
+              const mergedSquads = [
+                ...cloudSquads,
+                ...squads.filter((s: Squad) => !cloudSquads.some(cs => cs.id === s.id))
+              ];
+              setSquadsList(mergedSquads);
+            } catch (cloudErr) {
+              console.warn('Could not integrate cloud squads, using seed squads:', cloudErr);
+              if (ignore) return;
+              setSquadsList(squads);
+            }
+          } else {
             setSquadsList(squads);
           }
-        } else {
-          setSquadsList(squads);
-        }
 
-        setBattles(battlesList);
-        setFeedPosts(feed);
-        if (authProfile) {
-          setProfile(authProfile);
-        } else {
-          setProfile(userProfile);
+          setBattles(battlesList);
+          setFeedPosts(feed);
+          if (authProfile) {
+            setProfile(authProfile);
+          } else {
+            setProfile(userProfile);
+          }
+          
+          setError(null);
+          break; // Successfully booted all endpoints!
+        } catch (err) {
+          attempts++;
+          console.warn(`[Dream XI System] Telemetry boot attempt ${attempts}/${maxAttempts} failed:`, err);
+          if (attempts >= maxAttempts) {
+            if (!ignore) {
+              setError(`Could not establish connection with tactical database server. Make sure dev server is run on port 3000.`);
+            }
+          } else {
+            // Exponential backoff
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            delay *= 1.5;
+          }
         }
-      } catch (err) {
-        console.error('Failed to boot telemetry metrics', err);
-      } finally {
+      }
+
+      if (!ignore) {
         setLoading(false);
       }
     };
@@ -231,6 +271,10 @@ export default function App() {
     if (!authLoading) {
       loadInitialData();
     }
+
+    return () => {
+      ignore = true;
+    };
   }, [user, authLoading, authProfile]);
 
   const refreshSquadsList = async () => {
@@ -315,32 +359,36 @@ export default function App() {
     );
   }
 
-  // Display LoginPage/SignupPage if not logged in
-  if (!user) {
-    if (authScreen === 'login') {
-      return (
-        <LoginPage
-          onToggleForm={() => {
-            playFutSound('click');
-            setAuthScreen('signup');
+
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#07060b] text-white flex flex-col items-center justify-center font-mono text-center px-4 relative overflow-hidden">
+        {/* Glowing background spotlights */}
+        <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-red-500/5 blur-[100px] rounded-full pointer-events-none" />
+
+        <div className="relative mb-6">
+          <ShieldAlert className="w-12 h-12 text-red-500 animate-pulse" />
+        </div>
+        <p className="text-xs font-black tracking-[0.2em] text-red-500 uppercase italic leading-none">
+          TELEMETRY OFFLINE
+        </p>
+        <p className="text-[10px] text-gray-400 mt-2.5 max-w-md uppercase leading-normal tracking-wide">
+          {error}
+        </p>
+        
+        <button
+          onClick={() => {
+            setError(null);
+            setLoading(true);
+            window.location.reload();
           }}
-          onSuccess={() => {}}
-        />
-      );
-    } else {
-      return (
-        <SignupPage
-          onToggleForm={() => {
-            playFutSound('click');
-            setAuthScreen('login');
-          }}
-          onSuccess={() => {
-            playFutSound('success');
-            setAuthScreen('login');
-          }}
-        />
-      );
-    }
+          className="mt-6 px-5 py-2 border border-red-500/30 hover:border-emerald-500 text-red-300 hover:text-emerald-400 text-[10px] uppercase font-black tracking-widest rounded-md bg-transparent hover:bg-emerald-500/10 cursor-pointer shadow-sm hover:shadow-emerald-500/20 active:scale-95 transition-all animate-bounce"
+        >
+          FORCE RELOAD METRICS
+        </button>
+      </div>
+    );
   }
 
   if (loading) {
@@ -406,6 +454,47 @@ export default function App() {
             <span className="flex items-center gap-1.5 border-l border-white/10 pl-5">
               🔥 ARENAS: <strong className="text-pink-400">{battles.length} active</strong>
             </span>
+          </div>
+
+          {/* User Auth Action Segment */}
+          <div className="flex items-center gap-3" id="header-auth-status">
+            {user && profile ? (
+              <UserDropdown
+                profile={profile}
+                onNavigate={(tab) => {
+                  playFutSound('click');
+                  setActiveTab(tab);
+                }}
+                onLogout={async () => {
+                  playFutSound('click');
+                  await supabase.auth.signOut();
+                  window.location.reload();
+                }}
+              />
+            ) : (
+              <div className="flex items-center gap-2 font-mono text-[10px]" id="header-auth-buttons">
+                <button
+                  onClick={() => {
+                    playFutSound('click');
+                    setActiveTab('profile'); // Switch to profile page which prompts login
+                  }}
+                  className="px-3.5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 transition font-black uppercase cursor-pointer"
+                  id="header-login-btn"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => {
+                    playFutSound('click');
+                    setActiveTab('profile'); // Switch to profile page which prompts login
+                  }}
+                  className="px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:scale-105 active:scale-95 text-black font-sans font-black uppercase transition cursor-pointer shadow-[0_0_10px_rgba(52,211,153,0.2)]"
+                  id="header-signup-btn"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -583,19 +672,21 @@ export default function App() {
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
             {activeTab === 'builder' && (
-              <div className="flex flex-col gap-6">
-                <PitchBuilder
-                  userId={profile?.id || 'u-user'}
-                  userName={profile?.username || 'Gaffer_XI'}
-                  availablePlayers={availablePlayers}
-                  activeSquad={activeSquad}
-                  onSetSquad={handleSetSquadInPitch}
-                  onAnalyzeSquad={handleAnalyzeSquadTrigger}
-                />
+              <ProtectedRoute user={user} id="protected-builder">
+                <div className="flex flex-col gap-6">
+                  <PitchBuilder
+                    userId={profile?.id || 'u-user'}
+                    userName={profile?.username || 'Gaffer_XI'}
+                    availablePlayers={availablePlayers}
+                    activeSquad={activeSquad}
+                    onSetSquad={handleSetSquadInPitch}
+                    onAnalyzeSquad={handleAnalyzeSquadTrigger}
+                  />
 
-                {/* Inline visual drawer representing Gemini AI Analysis */}
-                <AIAnalysis squad={squadForAnalysis} />
-              </div>
+                  {/* Inline visual drawer representing Gemini AI Analysis */}
+                  <AIAnalysis squad={squadForAnalysis} />
+                </div>
+              </ProtectedRoute>
             )}
 
             {activeTab === 'feed' && (
@@ -635,20 +726,77 @@ export default function App() {
               <LeaderboardsView squadsList={squadsList} />
             )}
 
-            {activeTab === 'profile' && profile && (
-              <UserProfileView
-                profile={profile}
-                squadsList={squadsList}
-                onUpdateProfile={(p) => setProfile(p)}
-                onLoadSquad={(sq) => {
-                  setActiveSquad(sq);
-                  setActiveTab('builder');
-                  window.scrollTo({ top: 320, behavior: 'smooth' });
-                }}
-                onDeleteSquad={() => {
-                  refreshSquadsList();
-                }}
-              />
+            {activeTab === 'profile' && (
+              <ProtectedRoute user={user} id="protected-profile">
+                {profile && (
+                  <div key="profile-view" className="w-full">
+                    <UserProfileView
+                      profile={profile}
+                      squadsList={squadsList}
+                      onUpdateProfile={(p) => {
+                        setProfile(p);
+                        setAuthProfile(p);
+                      }}
+                      onLoadSquad={(sq) => {
+                        setActiveSquad(sq);
+                        setActiveTab('builder');
+                        window.scrollTo({ top: 320, behavior: 'smooth' });
+                      }}
+                      onDeleteSquad={() => {
+                        refreshSquadsList();
+                      }}
+                    />
+                  </div>
+                )}
+              </ProtectedRoute>
+            )}
+
+            {activeTab === 'settings' && (
+              <ProtectedRoute user={user} id="protected-settings">
+                {profile && (
+                  <div key="settings-view" className="w-full">
+                    <UserProfileView
+                      profile={profile}
+                      squadsList={squadsList}
+                      onUpdateProfile={(p) => {
+                        setProfile(p);
+                        setAuthProfile(p);
+                      }}
+                      onLoadSquad={(sq) => {
+                        setActiveSquad(sq);
+                        setActiveTab('builder');
+                        window.scrollTo({ top: 320, behavior: 'smooth' });
+                      }}
+                      onDeleteSquad={() => {
+                        refreshSquadsList();
+                      }}
+                      initialEditing={true}
+                    />
+                  </div>
+                )}
+              </ProtectedRoute>
+            )}
+
+            {activeTab === 'my-squads' && (
+              <ProtectedRoute user={user} id="protected-my-squads">
+                {profile && (
+                  <MySquadsView
+                    userId={profile.id}
+                    squadsList={squadsList}
+                    onLoadSquad={(sq) => {
+                      setActiveSquad(sq);
+                      setActiveTab('builder');
+                      window.scrollTo({ top: 320, behavior: 'smooth' });
+                    }}
+                    onDeleteSquad={() => {
+                      refreshSquadsList();
+                    }}
+                    onGoToBuilder={() => {
+                      setActiveTab('builder');
+                    }}
+                  />
+                )}
+              </ProtectedRoute>
             )}
 
           </motion.div>

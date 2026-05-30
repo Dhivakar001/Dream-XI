@@ -75,6 +75,11 @@ export interface UserProfile {
   badges: string[];
   squadsCount: number;
   bio: string;
+  avatar?: string;
+  favoritePlayer?: string;
+  createdAt?: string;
+  likesReceived?: number;
+  auraScore?: number;
 }
 
 export interface Battle {

@@ -55,6 +55,7 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
   useEffect(() => {
     if (!squad) return;
     
+    let ignore = false;
     const fetchAnalysis = async () => {
       setLoading(true);
       setErrorCode(null);
@@ -68,18 +69,26 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
           },
           body: JSON.stringify(squad),
         });
+        if (ignore) return;
         const data = await res.json();
         setResult(data);
         playFutSound('success');
       } catch (e) {
+        if (ignore) return;
         console.error('Failed to query squad analytical module', e);
         setErrorCode('Failed to complete tactical telemetry.');
       } finally {
-        setLoading(false);
+        if (!ignore) {
+          setLoading(false);
+        }
       }
     };
 
     fetchAnalysis();
+
+    return () => {
+      ignore = true;
+    };
   }, [squad]);
 
   // Render a beautiful interactive SVG radar chart based on statistics values
