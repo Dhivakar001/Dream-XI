@@ -21,6 +21,12 @@ import {
 import { Player, Squad, Battle, SocialPost, UserProfile } from './types';
 import { playFutSound } from './utils';
 
+// Import Auth hooks & Subpages
+import { useAuth } from './hooks/useAuth';
+import LoginPage from './app/login/page';
+import SignupPage from './app/signup/page';
+import { loadSquadsFromCloud } from './lib/supabaseDb';
+
 // Import Modular Components
 import PitchBuilder from './components/PitchBuilder';
 import AIAnalysis from './components/AIAnalysis';
@@ -93,6 +99,9 @@ const HERO_SHOWCASE_PLAYERS: Player[] = [
 ];
 
 export default function App() {
+  const { user, profile: authProfile, loading: authLoading } = useAuth();
+  const [authScreen, setAuthScreen] = useState<'login' | 'signup'>('login');
+
   const [activeTab, setActiveTab] = useState<TabName>('builder');
 
   // Core telemetry States
@@ -106,6 +115,13 @@ export default function App() {
   // Active sandbox entities
   const [activeSquad, setActiveSquad] = useState<Squad | undefined>(undefined);
   const [squadForAnalysis, setSquadForAnalysis] = useState<Squad | null>(null);
+
+  // Set premium authProfile if loaded from Supabase Cloud
+  useEffect(() => {
+    if (authProfile) {
+      setProfile(authProfile);
+    }
+  }, [authProfile]);
 
   // Load all telemetry endpoints concurrently on startup
   useEffect(() => {
@@ -128,10 +144,30 @@ export default function App() {
         ]);
 
         setAvailablePlayers(players);
-        setSquadsList(squads);
+        
+        if (user) {
+          try {
+            const cloudSquads = await loadSquadsFromCloud(user.id);
+            const mergedSquads = [
+              ...cloudSquads,
+              ...squads.filter((s: Squad) => !cloudSquads.some(cs => cs.id === s.id))
+            ];
+            setSquadsList(mergedSquads);
+          } catch (cloudErr) {
+            console.warn('Could not integrate cloud squads, using seed squads:', cloudErr);
+            setSquadsList(squads);
+          }
+        } else {
+          setSquadsList(squads);
+        }
+
         setBattles(battlesList);
         setFeedPosts(feed);
-        setProfile(userProfile);
+        if (authProfile) {
+          setProfile(authProfile);
+        } else {
+          setProfile(userProfile);
+        }
       } catch (err) {
         console.error('Failed to boot telemetry metrics', err);
       } finally {
@@ -139,18 +175,31 @@ export default function App() {
       }
     };
 
-    loadInitialData();
-  }, []);
+    if (!authLoading) {
+      loadInitialData();
+    }
+  }, [user, authLoading, authProfile]);
 
   const refreshSquadsList = async () => {
     try {
       const res = await fetch('/api/squads');
-      const data = await res.json();
-      setSquadsList(data);
+      const seedSquads = await res.json();
+      
+      if (user) {
+        const cloudSquads = await loadSquadsFromCloud(user.id);
+        const mergedSquads = [
+          ...cloudSquads,
+          ...seedSquads.filter((s: Squad) => !cloudSquads.some(cs => cs.id === s.id))
+        ];
+        setSquadsList(mergedSquads);
+      } else {
+        setSquadsList(seedSquads);
+      }
     } catch (e) {
       console.error('Failed to sync squads list', e);
     }
   };
+
 
   const refreshBattlesFeed = async () => {
     try {
@@ -190,24 +239,80 @@ export default function App() {
     window.scrollTo({ top: 320, behavior: 'smooth' });
   };
 
-  if (loading) {
+  if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#0B0B0F] text-white flex flex-col items-center justify-center font-mono text-center px-4">
+      <div className="min-h-screen bg-[#07060b] text-white flex flex-col items-center justify-center font-mono text-center px-4 relative overflow-hidden">
+        {/* Glowing background spotlights */}
+        <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-purple-500/5 blur-[100px] rounded-full pointer-events-none" />
+        
         <div className="relative mb-6">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-            className="w-16 h-16 rounded-full border-t-4 border-l-4 border-emerald-500 border-r-4 border-r-transparent"
+            className="w-16 h-16 rounded-full border-t-2 border-l-2 border-emerald-500 border-r-2 border-r-transparent shadow-[0_0_15px_rgba(16,185,129,0.2)]"
           />
-          <Trophy className="w-6 h-6 text-yellow-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+          <Trophy className="w-6 h-6 text-yellow-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-bounce" />
         </div>
-        <p className="text-sm font-black tracking-widest text-emerald-400 animate-pulse italic">
-          GENERATING FUTURISTIC STADIUM TELEMETRY...
+        <p className="text-xs font-black tracking-[0.2em] text-emerald-400 uppercase leading-none select-none">
+          SECURE SQUAD CHECK IN...
         </p>
-        <p className="text-[10px] text-gray-500 mt-2 uppercase font-medium">LET THEM COOK • DREAM XI LABS</p>
+        <p className="text-[9px] text-gray-500 mt-2.5 uppercase tracking-widest leading-none">VERIFYING STADIUM CREDENTIALS</p>
       </div>
     );
   }
+
+  // Display LoginPage/SignupPage if not logged in
+  if (!user) {
+    if (authScreen === 'login') {
+      return (
+        <LoginPage
+          onToggleForm={() => {
+            playFutSound('click');
+            setAuthScreen('signup');
+          }}
+          onSuccess={() => {}}
+        />
+      );
+    } else {
+      return (
+        <SignupPage
+          onToggleForm={() => {
+            playFutSound('click');
+            setAuthScreen('login');
+          }}
+          onSuccess={() => {
+            playFutSound('success');
+            setAuthScreen('login');
+          }}
+        />
+      );
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#07060b] text-white flex flex-col items-center justify-center font-mono text-center px-4 relative overflow-hidden">
+        {/* Glowing background spotlights */}
+        <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-purple-500/5 blur-[100px] rounded-full pointer-events-none" />
+
+        <div className="relative mb-6">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+            className="w-16 h-16 rounded-full border-t-2 border-l-2 border-emerald-500 border-r-2 border-r-transparent"
+          />
+          <Trophy className="w-6 h-6 text-yellow-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+        </div>
+        <p className="text-xs font-black tracking-[0.2em] text-emerald-400 uppercase italic leading-none">
+          GENERATING FUTURISTIC STADIUM TELEMETRY...
+        </p>
+        <p className="text-[9px] text-gray-500 mt-2.5 uppercase tracking-widest leading-none">LET THEM COOK • DREAM XI LABS</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen custom-grid-bg text-slate-100 flex flex-col font-sans select-none antialiased relative pb-20 sm:pb-8">
@@ -482,8 +587,17 @@ export default function App() {
                 profile={profile}
                 squadsList={squadsList}
                 onUpdateProfile={(p) => setProfile(p)}
+                onLoadSquad={(sq) => {
+                  setActiveSquad(sq);
+                  setActiveTab('builder');
+                  window.scrollTo({ top: 320, behavior: 'smooth' });
+                }}
+                onDeleteSquad={() => {
+                  refreshSquadsList();
+                }}
               />
             )}
+
           </motion.div>
         </AnimatePresence>
       </main>

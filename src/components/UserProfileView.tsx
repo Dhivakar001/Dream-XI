@@ -3,17 +3,24 @@ import { motion } from 'motion/react';
 import { User, Shield, Target, Award, Edit3, Save, Star, CheckCircle, MessageSquare, Sparkles, Flame, Trophy } from 'lucide-react';
 import { UserProfile, Squad } from '../types';
 import { playFutSound } from '../utils';
+import { supabase } from '../lib/supabase';
+import { deleteSquadFromCloud } from '../lib/supabaseDb';
 
 interface UserProfileViewProps {
   profile: UserProfile;
   squadsList: Squad[];
   onUpdateProfile: (newProfile: UserProfile) => void;
+  onLoadSquad?: (squad: Squad) => void;
+  onDeleteSquad?: (squadId: string) => void;
 }
+
 
 export default function UserProfileView({
   profile,
   squadsList,
   onUpdateProfile,
+  onLoadSquad,
+  onDeleteSquad,
 }: UserProfileViewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [userName, setUserName] = useState(profile.username);
@@ -110,7 +117,7 @@ export default function UserProfileView({
             </div>
           ) : (
             <div>
-              <div className="flex items-center gap-2.5 justify-center md:justify-start">
+              <div className="flex items-center gap-2.5 justify-center md:justify-start flex-wrap">
                 <h1 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-gray-400 uppercase tracking-tight">@{profile.username}</h1>
                 <button
                   onClick={() => { playFutSound('click'); setIsEditing(true); }}
@@ -119,7 +126,19 @@ export default function UserProfileView({
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                 </button>
+                <button
+                  onClick={async () => {
+                    playFutSound('click');
+                    await supabase.auth.signOut();
+                    window.location.reload();
+                  }}
+                  className="text-[9px] font-mono font-black uppercase tracking-wider px-2.5 py-1.5 rounded-xl bg-red-950/40 hover:bg-red-900/40 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:scale-105 active:scale-95 cursor-pointer transition select-none"
+                  title="Disconnect Gaffer Session"
+                >
+                  Disconnect XI
+                </button>
               </div>
+
               <p className="text-xs text-slate-300 font-mono italic mt-2.5 max-w-md bg-black/25 p-2 rounded-lg border border-white/5 mx-auto md:mx-0 text-center md:text-left leading-normal">
                 "{profile.bio}"
               </p>
@@ -194,9 +213,37 @@ export default function UserProfileView({
                     </p>
                   </div>
 
-                  <span className="px-3 py-1.5 rounded-lg bg-emerald-900/20 text-[#10b981] text-[9px] border border-emerald-500/10 uppercase tracking-widest font-black leading-none">
-                    LOCKED
-                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        playFutSound('success');
+                        if (onLoadSquad) onLoadSquad(sq);
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 font-sans font-black text-[9px] text-black leading-none uppercase tracking-wider transition cursor-pointer select-none"
+                    >
+                      EDIT XI
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Are you sure you want to bench '${sq.name}' permanent-wise?`)) return;
+                        playFutSound('click');
+                        const isRealUser = profile.id && !profile.id.startsWith('u-');
+                        if (isRealUser) {
+                          await deleteSquadFromCloud(sq.id);
+                        }
+                        // Fallback API delete
+                        try {
+                          await fetch(`/api/squads/${sq.id}`, { method: 'DELETE' });
+                        } catch (err) {
+                          console.warn('Fallback delete warning:', err);
+                        }
+                        if (onDeleteSquad) onDeleteSquad(sq.id);
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl bg-red-950/40 hover:bg-red-900/40 border border-red-500/20 hover:border-red-500/40 font-mono text-[9px] text-red-400 leading-none uppercase transition cursor-pointer select-none"
+                    >
+                      BENCH
+                    </button>
+                  </div>
                 </div>
               ))
             )}

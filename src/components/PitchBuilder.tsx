@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Search, RotateCcw, Save, ShieldAlert, Cpu, Sparkles, Filter, Check, X, Users, Dumbbell, Share2, Camera, Flame, Trophy } from 'lucide-react';
 import { FormationName, Squad, SquadSlot, Player } from '../types';
 import { FORMATIONS } from '../formations';
+import { saveSquadToCloud } from '../lib/supabaseDb';
+
 import { calculateSquadChemistry, calculateSquadRating, calculateSquadAura, playFutSound } from '../utils';
 import HolographicCard from './HolographicCard';
 
@@ -272,7 +274,7 @@ export default function PitchBuilder({
     setIsSaving(true);
     playFutSound('click');
     
-    const finalSquad: Squad = {
+    let finalSquad: Squad = {
       id: activeSquad?.id || 's-' + Math.random().toString(36).substring(2, 9),
       name: squadName,
       userId: userId || 'u-user',
@@ -290,6 +292,16 @@ export default function PitchBuilder({
     };
 
     try {
+      // 1. If signed in, save directly to Supabase
+      const isRealUser = userId && !userId.startsWith('u-');
+      if (isRealUser) {
+        const cloudResult = await saveSquadToCloud(finalSquad, userId);
+        if (cloudResult.success && cloudResult.squad) {
+          finalSquad = cloudResult.squad;
+        }
+      }
+
+      // 2. Always log/persist in fallback express server
       const res = await fetch('/api/squads', {
         method: 'POST',
         headers: {
@@ -298,7 +310,7 @@ export default function PitchBuilder({
         body: JSON.stringify(finalSquad),
       });
       const data = await res.json();
-      if (data.success) {
+      if (data.success || isRealUser) {
         setIsSaving(false);
         setShowSaveModal(false);
         onSetSquad(finalSquad);
@@ -309,6 +321,7 @@ export default function PitchBuilder({
       setIsSaving(false);
     }
   };
+
 
   const handleAIAnalyze = () => {
     playFutSound('click');
