@@ -1,0 +1,6 @@
+{
+  "name": "Dream XI",
+  "description": "The ultimate full-stack football fantasy squad builder and debate arena, featuring dynamic tactics custom styling, battle arenas, live simulators, and tactical AI analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
