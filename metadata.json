@@ -1,6 +1,6 @@
 {
-  "name": "Dream XI",
-  "description": "The ultimate full-stack football fantasy squad builder and debate arena, featuring dynamic tactics custom styling, battle arenas, live simulators, and tactical AI analysis.",
+  "name": "Dream XI Labs",
+  "description": "TikTok meets FIFA. Spotify Wrapped meets Football. Build the squad everyone will argue about. Create your Dream XI, calculate your Aura Score, and go viral.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_FORWARD_GEMINI_API", "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

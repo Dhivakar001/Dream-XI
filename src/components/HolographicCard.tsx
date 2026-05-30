@@ -16,57 +16,75 @@ export default function HolographicCard({
   size = 'md',
   showStats = true,
 }: HolographicCardProps) {
-  const getCardStyle = (type: Player['cardType']) => {
+  const getCardStyle = (type: Player['cardType'], rating: number) => {
+    // If rating is 97+, they deserve GOAT status!
+    if (rating >= 97) {
+      return {
+        bg: 'bg-gradient-to-b from-[#120024] via-[#3a064d] to-[#04000c] border-[#ff00e5]',
+        text: 'text-white',
+        ratingText: 'text-[#ffd700] drop-shadow-[0_0_8px_rgba(255,215,0,0.8)] font-black',
+        badge: 'border-[#ff00e5] text-[#ffd700] bg-[#1a0033] shadow-[0_0_12px_rgba(255,0,229,0.5)]',
+        glow: 'shadow-[0_0_30px_rgba(255,0,229,0.6)]',
+        banner: 'bg-gradient-to-r from-[#ff00e5] via-[#ffd700] to-[#00f0ff] text-black font-extrabold',
+        label: '🐐 GOAT',
+      };
+    }
+
     switch (type) {
       case 'TOTY':
         return {
-          bg: 'bg-gradient-to-b from-[#0e215c] via-[#09153d] to-[#040924] border-[#d2a34c]',
+          bg: 'bg-gradient-to-b from-[#09153d] via-[#102a7a] to-[#020514] border-[#d2a34c]',
           text: 'text-white',
-          ratingText: 'text-[#d2a34c] font-[#d2a34c]',
-          badge: 'border-[#d2a34c] text-[#d2a34c] bg-[#1a2d6b]',
-          glow: 'shadow-[0_0_20px_rgba(210,163,76,0.5)]',
-          banner: 'bg-gradient-to-r from-[#d2a34c] to-[#f3e3a4] text-black font-semibold',
+          ratingText: 'text-[#ffd700] font-black',
+          badge: 'border-[#d2a34c] text-[#ffd700] bg-[#1a2d6b]',
+          glow: 'shadow-[0_0_20px_rgba(210,163,76,0.6)]',
+          banner: 'bg-gradient-to-r from-[#d2a34c] to-[#ffd700] text-black font-extrabold',
+          label: '🔥 TOTY',
         };
       case 'Legend':
         return {
-          bg: 'bg-gradient-to-b from-[#1a1c1d] via-[#111314] to-[#050607] border-[#ccaa51]',
-          text: 'text-[#e5c158]',
-          ratingText: 'text-[#ccaa51]',
-          badge: 'border-[#ccaa51] text-[#ccaa51] bg-[#1d1f21]',
-          glow: 'shadow-[0_0_20px_rgba(204,170,81,0.4)]',
-          banner: 'bg-[#ccaa51] text-black font-semibold',
+          bg: 'bg-gradient-to-b from-[#221c0f] via-[#423414] to-[#090703] border-[#ffd700]',
+          text: 'text-[#ffed4a]',
+          ratingText: 'text-[#ffd700] font-black',
+          badge: 'border-[#ffd700] text-[#ffd700] bg-[#1d1d11]',
+          glow: 'shadow-[0_0_20px_rgba(255,215,0,0.5)]',
+          banner: 'bg-[#ffd700] text-black font-black',
+          label: '👑 LEGEND',
         };
       case 'Icon':
         return {
-          bg: 'bg-gradient-to-b from-[#1c1c1a] via-[#121210] to-[#000000] border-[#c0b080]',
+          bg: 'bg-gradient-to-b from-[#1a1c1d] via-[#2d3238] to-[#08090a] border-[#a0aec0]',
           text: 'text-white',
-          ratingText: 'text-[#c0b080]',
-          badge: 'border-[#c0b080] text-[#c0b080] bg-[#1a1917]',
-          glow: 'shadow-[0_0_15px_rgba(192,176,128,0.3)]',
-          banner: 'bg-[#c0b080] text-black font-semibold',
+          ratingText: 'text-[#a0aec0] font-black',
+          badge: 'border-[#a0aec0] text-[#a0aec0] bg-[#1a1917]',
+          glow: 'shadow-[0_0_15px_rgba(160,174,192,0.4)]',
+          banner: 'bg-[#a0aec0] text-black font-bold',
+          label: '✨ ICON',
         };
       case 'Future Star':
         return {
-          bg: 'bg-gradient-to-b from-[#3a062d] via-[#210219] to-[#0a0007] border-[#ff00a0]',
+          bg: 'bg-gradient-to-b from-[#001f3f] via-[#0074d9] to-[#000d1a] border-[#00f0ff]',
           text: 'text-white',
-          ratingText: 'text-[#ff00a0]',
-          badge: 'border-[#ff00a0] text-[#ff00a0] bg-[#3a0322]',
-          glow: 'shadow-[0_0_20px_rgba(255,0,160,0.5)]',
-          banner: 'bg-gradient-to-r from-[#ff00a0] to-[#ff00ff] text-white font-semibold',
+          ratingText: 'text-[#00f0ff] font-black',
+          badge: 'border-[#00f0ff] text-[#00f0ff] bg-[#001f3f]',
+          glow: 'shadow-[0_0_20px_rgba(0,240,255,0.6)]',
+          banner: 'bg-gradient-to-r from-[#00f0ff] to-[#39cdc4] text-black font-extrabold',
+          label: '🚀 FUTURE STAR',
         };
       default: // Gold
         return {
-          bg: 'bg-gradient-to-b from-[#2a220b] via-[#131005] to-[#030301] border-[#d5b84d]',
+          bg: 'bg-gradient-to-b from-[#1c191a] via-[#332f30] to-[#0a0909] border-[#22c55e]',
           text: 'text-white',
-          ratingText: 'text-[#d5b84d]',
-          badge: 'border-[#d5b84d] text-[#d5b84d] bg-[#221d09]',
-          glow: 'shadow-[0_0_12px_rgba(213,184,77,0.25)]',
-          banner: 'bg-[#d5b84d] text-black',
+          ratingText: 'text-[#22c55e] font-black',
+          badge: 'border-[#22c55e] text-[#22c55e] bg-[#0f1d13]',
+          glow: 'shadow-[0_0_12px_rgba(34,197,95,0.4)]',
+          banner: 'bg-[#22c55e] text-black font-bold',
+          label: '🟢 STAR',
         };
     }
   };
 
-  const card = getCardStyle(player.cardType);
+  const card = getCardStyle(player.cardType, player.rating);
 
   // Sizing definitions
   const dimensions = {
@@ -95,10 +113,13 @@ export default function HolographicCard({
       style={{ perspective: 1000 }}
     >
       {/* Holographic sparkle top layer on hover */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/10 opacity-40 mix-blend-overlay" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-40 mix-blend-overlay" />
       
+      {/* Premium holographic sliding flare wave */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full rotate-45 group-hover:animate-holo-shine pointer-events-none" style={{ animationDuration: '2.5s' }} />
+
       {/* Sparkle effect icon on premium items */}
-      {player.cardType !== 'Gold' && (
+      {(player.cardType !== 'Gold' || player.rating >= 97) && (
         <div className="absolute top-2 right-2 animate-pulse">
           <Sparkles className="w-4 h-4 text-[#ffe58f] drop-shadow-[0_0_5px_currentColor]" />
         </div>
@@ -123,7 +144,7 @@ export default function HolographicCard({
         
         {/* Playstyle Tag overlay */}
         <div className={`px-2 py-0.5 border rounded text-[9px] uppercase tracking-wider font-extrabold font-mono select-none ${card.badge}`}>
-          {player.cardType}
+          {card.label}
         </div>
       </div>
 

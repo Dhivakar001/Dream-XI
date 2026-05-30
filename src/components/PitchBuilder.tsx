@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, RotateCcw, Save, ShieldAlert, Cpu, Sparkles, Filter, Check, X, Users, Dumbbell } from 'lucide-react';
+import { Search, RotateCcw, Save, ShieldAlert, Cpu, Sparkles, Filter, Check, X, Users, Dumbbell, Share2, Camera, Flame, Trophy } from 'lucide-react';
 import { FormationName, Squad, SquadSlot, Player } from '../types';
 import { FORMATIONS } from '../formations';
 import { calculateSquadChemistry, calculateSquadRating, calculateSquadAura, playFutSound } from '../utils';
@@ -35,8 +35,18 @@ export default function PitchBuilder({
   // Dialog controls
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
+
+  // Aura Level helper
+  const getAuraBadge = (score: number) => {
+    if (score < 40) return { text: '❄️ COLD RATING', bg: 'bg-cyan-950/40', border: 'border-cyan-500/30', textClass: 'text-cyan-400', rating: 'TRENCH LEVEL' };
+    if (score < 70) return { text: '📈 RISING HYPE', bg: 'bg-purple-950/40', border: 'border-purple-500/30', textClass: 'text-purple-400', rating: 'RESPECTABLE' };
+    if (score < 85) return { text: '⚡ ELITE ENERGY', bg: 'bg-amber-950/40', border: 'border-amber-500/30', textClass: 'text-amber-400', rating: 'HE COOKED' };
+    if (score < 95) return { text: '👑 GOAT STATUS', bg: 'bg-orange-950/40', border: 'border-orange-500/40', textClass: 'text-orange-400', rating: 'HYPE LORDS' };
+    return { text: '🔥 LEGENDARY AURA', bg: 'bg-red-950/50', border: 'border-red-500/50 animate-pulse', textClass: 'text-red-400 font-extrabold', rating: 'ULTIMATE XI' };
+  };
 
   // Search & Filters inside Selector
   const [searchTerm, setSearchTerm] = useState('');
@@ -367,22 +377,43 @@ export default function PitchBuilder({
         </div>
 
         {/* Dynamic Stadium Soccer Pitch */}
-        <div className="w-full max-w-3xl bg-radial from-[#132c1b] via-[#09170e] to-black aspect-[3/4] relative rounded-3xl overflow-hidden border border-emerald-500/25 shadow-[0_0_40px_rgba(16,185,129,0.15)] select-none">
+        <div className="w-full max-w-3xl bg-radial from-[#092513] via-[#051108] to-black aspect-[3/4] relative rounded-3xl overflow-hidden border-2 border-emerald-500/40 shadow-[0_0_55px_rgba(16,185,129,0.25)] select-none">
+          {/* Turf Strip Patterns */}
+          <div className="absolute inset-0 flex flex-col pointer-events-none opacity-20">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div
+                key={i}
+                className={`w-full flex-1 ${i % 2 === 0 ? 'bg-emerald-900/30' : 'bg-transparent'}`}
+              />
+            ))}
+          </div>
+
+          {/* Cyber Stadium Spotlight Beams */}
+          <div className="absolute top-0 left-0 w-32 h-32 bg-radial from-emerald-400/25 to-transparent filter blur-xl animate-pulse pointer-events-none" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-radial from-emerald-400/25 to-transparent filter blur-xl animate-pulse pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-40 h-40 bg-radial from-teal-500/20 to-transparent filter blur-2xl pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-40 h-40 bg-radial from-teal-500/20 to-transparent filter blur-2xl pointer-events-none" />
+          
+          {/* Corner Light beams */}
+          <div className="absolute -top-[20%] -left-[20%] w-[80%] h-[80%] bg-gradient-to-br from-white/10 via-emerald-400/5 to-transparent rotate-45 transform origin-top-left pointer-events-none mix-blend-screen" />
+          <div className="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] bg-gradient-to-bl from-white/10 via-emerald-400/5 to-transparent -rotate-45 transform origin-top-right pointer-events-none mix-blend-screen" />
+
           {/* Pitch Lines */}
           <div className="absolute inset-0 p-4 pointer-events-none select-none">
-            <div className="w-full h-full border border-white/10 rounded-2xl relative select-none">
+            <div className="w-full h-full border border-emerald-500/20 rounded-2xl relative select-none">
               {/* Midfield line index */}
-              <div className="w-full h-px bg-white/10 absolute top-1/2 left-0 select-none text-transparent" />
-              <div className="w-24 h-24 border border-white/10 rounded-full absolute top-1/2 left-1/2 -ml-12 -mt-12 select-none" />
-              <div className="w-4 h-4 rounded-full bg-white/10 absolute top-1/2 left-1/2 -ml-2 -mt-2 select-none" />
+              <div className="w-full h-px bg-emerald-500/20 absolute top-1/2 left-0 select-none text-transparent" />
+              <div className="w-32 h-32 border border-emerald-500/20 rounded-full absolute top-1/2 left-1/2 -ml-16 -mt-16 select-none" />
+              <div className="w-4 h-4 rounded-full bg-emerald-400/40 absolute top-1/2 left-1/2 -ml-2 -mt-2 animate-ping select-none" />
+              <div className="w-3 h-3 rounded-full bg-emerald-400/60 absolute top-1/2 left-1/2 -ml-1.5 -mt-1.5 select-none" />
               
               {/* Penalty Boxes */}
               {/* Goal top */}
-              <div className="w-48 h-20 border border-white/10 absolute top-0 left-1/2 -ml-24 rounded-b select-none" />
-              <div className="w-20 h-8 border border-white/10 absolute top-0 left-1/2 -ml-10 rounded-b select-none" />
+              <div className="w-52 h-24 border border-emerald-500/20 absolute top-0 left-1/2 -ml-26 rounded-b backdrop-blur-[1px] select-none" />
+              <div className="w-24 h-10 border border-emerald-500/30 absolute top-0 left-1/2 -ml-12 rounded-b select-none" />
               {/* Goal bottom */}
-              <div className="w-48 h-20 border border-white/10 absolute bottom-0 left-1/2 -ml-24 rounded-t select-none" />
-              <div className="w-20 h-8 border border-white/10 absolute bottom-0 left-1/2 -ml-10 rounded-t select-none" />
+              <div className="w-52 h-24 border border-emerald-500/20 absolute bottom-0 left-1/2 -ml-26 rounded-t backdrop-blur-[1px] select-none" />
+              <div className="w-24 h-10 border border-emerald-500/30 absolute bottom-0 left-1/2 -ml-12 rounded-t select-none" />
             </div>
           </div>
 
@@ -466,55 +497,77 @@ export default function PitchBuilder({
       <div className="w-full lg:w-96 flex flex-col gap-5">
         {/* Core Metrics Bento box */}
         <div className="bg-slate-900/90 border border-white/5 rounded-2xl p-5 backdrop-blur shadow-xl relative overflow-hidden">
+          {/* Neon background grids */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1.5px,transparent_1.5px),linear-gradient(90deg,rgba(255,255,255,0.01)_1.5px,transparent_1.5px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
+          
           <div className="absolute top-0 right-0 p-3 select-none">
-            <Sparkles className="w-5 h-5 text-yellow-400/20 animate-pulse" />
+            <Sparkles className="w-5 h-5 text-yellow-400/25 animate-pulse" />
           </div>
 
-          <h3 className="font-black text-sm tracking-wide text-white uppercase mb-4 pb-2 border-b border-white/5">
-            TEAM STATISTICS
+          <h3 className="font-extrabold text-xs tracking-widest text-[#10b981] uppercase mb-4 pb-2 border-b border-white/5 flex items-center gap-1.5">
+            <Trophy className="w-4 h-4 text-emerald-400" />
+            TEAM PERFORMANCE
           </h3>
 
           <div className="grid grid-cols-2 gap-4">
             {/* Rating Metric */}
-            <div className="bg-slate-800/50 border border-white/5 rounded-xl p-3 text-center">
-              <span className="text-[10px] text-gray-400 font-mono tracking-wider uppercase block mb-1">TEAM RATING:</span>
+            <div className="bg-slate-800/40 border border-white/5 rounded-xl p-3 text-center transform hover:scale-[1.02] transition">
+              <span className="text-[9px] text-gray-400 font-mono tracking-wider uppercase block mb-1">TEAM RATING:</span>
               <div className="inline-flex items-baseline gap-1">
-                <span className="text-3xl font-black text-white">{teamRating}</span>
-                <span className="text-yellow-400 font-extrabold text-xs">OVR</span>
+                <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-300 drop-shadow-[0_0_8px_rgba(250,204,21,0.2)]">{teamRating}</span>
+                <span className="text-yellow-400 font-extrabold text-[10px]">OVR</span>
               </div>
-              <div className="w-full bg-slate-700/50 rounded-full h-1 mt-2.5">
+              <div className="w-full bg-slate-700/50 rounded-full h-1 mt-2.5 overflow-hidden">
                 <div className="bg-yellow-400 h-1 rounded-full" style={{ width: `${teamRating}%` }} />
               </div>
             </div>
 
             {/* Chemistry Metric */}
-            <div className="bg-slate-800/50 border border-white/5 rounded-xl p-3 text-center">
-              <span className="text-[10px] text-gray-400 font-mono tracking-wider uppercase block mb-1">CHEMISTRY:</span>
+            <div className="bg-slate-800/40 border border-white/5 rounded-xl p-3 text-center transform hover:scale-[1.02] transition">
+              <span className="text-[9px] text-gray-400 font-mono tracking-wider uppercase block mb-1">CHEMISTRY:</span>
               <div className="inline-flex items-baseline gap-1">
-                <span className="text-3xl font-black text-emerald-400">{chemistryResult.total}</span>
-                <span className="text-emerald-500 text-xs font-bold">/100</span>
+                <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-300 drop-shadow-[0_0_8px_rgba(16,185,129,0.2)]">{chemistryResult.total}</span>
+                <span className="text-emerald-500 text-[10px] font-bold">/100</span>
               </div>
-              <div className="w-full bg-slate-700/50 rounded-full h-1 mt-2.5">
+              <div className="w-full bg-slate-700/50 rounded-full h-1 mt-2.5 overflow-hidden">
                 <div className="bg-[#10b981] h-1 rounded-full filter drop-shadow-[0_0_2px_#10b981]" style={{ width: `${chemistryResult.total}%` }} />
               </div>
             </div>
           </div>
 
-          {/* Aura Score Metric */}
-          <div className="w-full bg-gradient-to-r from-emerald-950/20 to-teal-950/20 border border-emerald-500/10 rounded-xl p-3 mt-4 flex items-center justify-between">
-            <div>
-              <span className="text-[10px] text-gray-400 font-mono tracking-wider uppercase block">COMBINED SQUAD AURA:</span>
-              <span className="text-lg font-black text-white">
-                {teamAura > 0 ? `${teamAura}% AURA` : '0% AURA'}
-              </span>
-            </div>
-            <div className="px-3 py-1 rounded-lg bg-emerald-900/30 text-[#10b981] text-[10px] font-mono border border-emerald-500/20 uppercase tracking-widest leading-none">
-              🔥 LIVELY
-            </div>
-          </div>
+          {/* Aura Score Metric with custom fire rating badge! */}
+          {(() => {
+            const badge = getAuraBadge(teamAura);
+            return (
+              <div className={`w-full ${badge.bg} border ${badge.border} rounded-xl p-4 mt-4 relative overflow-hidden flex flex-col gap-2.5 transition duration-300`}>
+                <div className="absolute -right-3 -bottom-3 text-yellow-500/10 pointer-events-none select-none">
+                  <Flame className="w-16 h-16 animate-bounce" />
+                </div>
 
-          <p className="text-[10px] text-gray-400 mt-4 leading-relaxed font-mono">
-            💡 Chemistry yields crucial precision. Pair up players from the same <b>clubs</b> (e.g., Real Madrid), <b>countries</b> (e.g., Brazil), or <b>leagues</b> in their natural positions to max synergistic output!
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[9px] text-gray-400 font-mono tracking-wider uppercase block">SQUAD AURA INDEX:</span>
+                    <span className="text-xl font-black text-white block leading-none mt-1">
+                      {teamAura > 0 ? `${teamAura}% AURA` : '0% AURA'}
+                    </span>
+                  </div>
+                  <div className={`px-2.5 py-1 rounded-lg ${badge.textClass} text-[10px] font-black tracking-wider uppercase border border-current bg-black/40`}>
+                    {badge.text}
+                  </div>
+                </div>
+
+                <div className="w-full bg-black/40 border border-white/5 rounded-lg p-2 flex items-center justify-between">
+                  <span className="text-[10px] text-gray-400 font-mono uppercase">TIER LEVEL:</span>
+                  <span className={`text-[11px] font-bold ${badge.textClass} tracking-widest`}>
+                    {teamAura > 0 ? badge.rating : 'NO AURA YET'}
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
+
+          <p className="text-[9px] text-gray-400 mt-4 leading-relaxed font-mono">
+            💡 Chemistry yields crucial precision. Pair up players from the same <b>clubs</b>, <b>countries</b>, or <b>leagues</b> in their natural positions to max synergistic output!
           </p>
         </div>
 
@@ -523,7 +576,7 @@ export default function PitchBuilder({
           <button
             onClick={handleAIAnalyze}
             disabled={slots.filter(s => s.player !== null).length === 0}
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition cursor-pointer disabled:opacity-50 disabled:pointer-events-none shadow-[0_0_15px_rgba(234,179,8,0.3)]"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition cursor-pointer disabled:opacity-50 disabled:pointer-events-none shadow-[0_0_15px_rgba(234,179,8,0.3)]"
           >
             <Cpu className="w-4 h-4 animate-spin-slow" />
             AI SQUAD COMMENTARY
@@ -532,10 +585,20 @@ export default function PitchBuilder({
           <button
             onClick={() => { playFutSound('click'); setShowSaveModal(true); }}
             disabled={slots.filter(s => s.player !== null).length === 0}
-            className="w-full py-3.5 rounded-xl bg-slate-800 border border-white/10 text-white hover:text-yellow-400 select-none font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] transition cursor-pointer disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-slate-800 border border-white/10 text-white hover:text-yellow-400 select-none font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] transition cursor-pointer disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             LOCK SQUAD IN DB
+          </button>
+
+          <button
+            onClick={() => { playFutSound('success'); setShowShareModal(true); }}
+            disabled={slots.filter(s => s.player !== null).length === 0}
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-500 text-white font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition cursor-pointer disabled:opacity-50 shadow-[0_0_20px_rgba(219,39,119,0.3)]"
+            title="Export a beautiful Instagram story layout to screenshot and share!"
+          >
+            <Camera className="w-4 h-4" />
+            📸 VIRAL STORY EXPORT
           </button>
         </div>
       </div>
@@ -768,6 +831,123 @@ export default function PitchBuilder({
                 </div>
               </div>
             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* 5. VIRAL INSTAGRAM STORY EXPORT MODAL */}
+      <AnimatePresence>
+        {showShareModal && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 z-50">
+            <div className="text-center mb-4 max-w-xs md:max-w-md">
+              <span className="text-[10px] font-black tracking-widest bg-gradient-to-r from-pink-500 to-yellow-400 text-black px-3 py-1 rounded-full uppercase">
+                📸 READY FOR TIKTOK & INSTA STORIES
+              </span>
+              <p className="text-gray-400 text-xs mt-2 font-mono">
+                Take a quick screenshot, crop, and watch the trenches argue!
+              </p>
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 15 }}
+              className="w-[320px] aspect-[9/16] md:w-[350px] bg-gradient-to-b from-slate-950 via-slate-900 to-black rounded-3xl border-2 border-fuchsia-500/65 relative overflow-hidden flex flex-col justify-between p-6 shadow-[0_0_50px_rgba(236,72,153,0.3)]"
+            >
+              {/* Animated corner lights */}
+              <div className="absolute top-0 left-0 w-32 h-32 bg-radial from-pink-500/20 to-transparent filter blur-xl animate-pulse pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-32 h-32 bg-radial from-indigo-500/20 to-transparent filter blur-xl animate-pulse pointer-events-none" />
+              {/* Neon overlay grid lines */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(219,39,119,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(219,39,119,0.02)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+
+              {/* Story Header */}
+              <div className="relative z-10 flex justify-between items-start border-b border-pink-500/25 pb-3">
+                <div>
+                  <div className="flex items-center gap-1.5 text-pink-400 font-black text-xs tracking-widest uppercase">
+                    <Flame className="w-4 h-4 text-pink-500 animate-bounce" />
+                    DREAM XI LABS
+                  </div>
+                  <h4 className="text-lg font-black text-white leading-none mt-1 truncate max-w-[190px]">
+                    {squadName}
+                  </h4>
+                  <span className="text-[9px] text-[#10b981] font-mono uppercase tracking-wider">
+                    👉 FORMATION: {formationName}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <div className="bg-black/60 border border-pink-500/30 rounded-lg p-1.5">
+                    <span className="text-[8px] text-gray-400 font-mono block">RATING</span>
+                    <span className="text-lg font-black text-yellow-400 leading-none">{teamRating}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Central Area: Roster Overview */}
+              <div className="relative z-10 my-4 flex-1 flex flex-col justify-center">
+                <div className="space-y-1 bg-black/40 rounded-2xl p-3 border border-white/5 backdrop-blur-sm max-h-[300px] overflow-hidden">
+                  <div className="text-[8px] font-mono tracking-widest text-[#10b981] uppercase border-b border-white/5 pb-1 mb-1.5 flex items-center justify-between">
+                    <span>SQUAD LINEUP</span>
+                    <span>OVR CLASS</span>
+                  </div>
+                  {slots.map((slot, index) => {
+                    const pos = FORMATIONS[formationName].positions.find(p => p.id === slot.positionId);
+                    return (
+                      <div key={index} className="flex items-center justify-between text-[10px] font-mono py-1 border-b border-white/5 last:border-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[8px] px-1 bg-pink-900/40 text-pink-400 rounded font-black border border-pink-500/20 uppercase w-7 text-center">
+                            {pos?.label || 'SUB'}
+                          </span>
+                          <span className="text-white font-bold truncate max-w-[150px]">
+                            {slot.player ? slot.player.name : 'EMPTY SLOT'}
+                          </span>
+                        </div>
+                        {slot.player ? (
+                          <span className="text-yellow-400 font-black text-[9px] bg-slate-800/80 px-1 py-0.5 rounded border border-white/5">
+                            {slot.player.rating} {slot.player.position}
+                          </span>
+                        ) : (
+                          <span className="text-gray-600 font-black text-[9px]">-</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Foot: Aura & Callout */}
+              <div className="relative z-10 border-t border-fuchsia-500/25 pt-4">
+                {(() => {
+                  const badge = getAuraBadge(teamAura);
+                  return (
+                    <div className="bg-gradient-to-r from-pink-950/20 to-purple-950/20 border border-pink-500/20 rounded-xl p-2.5 mb-3 flex items-center justify-between">
+                      <div>
+                        <span className="text-[8px] text-gray-400 font-mono block uppercase">AURA METRIC:</span>
+                        <span className={`text-xs font-black ${badge.textClass} tracking-wider`}>
+                          {badge.text}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[8px] text-gray-500 font-mono block">OVR ENERGY</span>
+                        <span className="text-xs font-bold text-white uppercase tracking-widest select-none">
+                          {teamAura}%
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                <div className="text-center font-black text-[10px] tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400">
+                  ⚡ RATE MY TEAM IN THE COMMENTS ⚡
+                </div>
+              </div>
+            </motion.div>
+
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="mt-6 px-6 py-2 bg-slate-800 text-white rounded-full font-black text-xs tracking-wider uppercase hover:bg-slate-700 cursor-pointer active:scale-95 transition"
+            >
+              CLOSE PREVIEW
+            </button>
           </div>
         )}
       </AnimatePresence>
