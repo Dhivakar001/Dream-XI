@@ -390,47 +390,45 @@ export default function PitchBuilder({
         </div>
 
         {/* Dynamic Stadium Soccer Pitch */}
-        <div className="w-full max-w-3xl bg-radial from-[#092513] via-[#051108] to-black aspect-[3/4] relative rounded-3xl overflow-hidden border-2 border-emerald-500/40 shadow-[0_0_55px_rgba(16,185,129,0.25)] select-none">
-          {/* Turf Strip Patterns */}
-          <div className="absolute inset-0 flex flex-col pointer-events-none opacity-20">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-full flex-1 ${i % 2 === 0 ? 'bg-emerald-900/30' : 'bg-transparent'}`}
-              />
-            ))}
+        <div className="w-full max-w-3xl bg-radial from-[#10301a] via-[#06120b] to-[#040407] aspect-[3/4] relative rounded-3xl overflow-hidden border-[3px] border-black shadow-[10px_10px_0px_#FBE116] select-none">
+          {/* Street Yard Pavement Decal lines */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(251,225,22,0.015)_2px,transparent_2px),linear-gradient(90deg,rgba(0,158,73,0.015)_2px,transparent_2px)] bg-[size:32px_32px] pointer-events-none opacity-30" />
+
+          {/* Nike Brazil Joga Bonito Center Backdrop sticker stamp */}
+          <div className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-graffiti text-[#FBE116]/8 select-none pointer-events-none text-2xl sm:text-5xl uppercase rotate-[-8deg] tracking-[0.2em] select-none">
+            🇧🇷 RIO DE JANEIRO • JOGA RUA
           </div>
 
           {/* Cyber Stadium Spotlight Beams */}
-          <div className="absolute top-0 left-0 w-32 h-32 bg-radial from-emerald-400/25 to-transparent filter blur-xl animate-pulse pointer-events-none" />
-          <div className="absolute top-0 right-0 w-32 h-32 bg-radial from-emerald-400/25 to-transparent filter blur-xl animate-pulse pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-40 h-40 bg-radial from-teal-500/20 to-transparent filter blur-2xl pointer-events-none" />
-          <div className="absolute bottom-0 right-0 w-40 h-40 bg-radial from-teal-500/20 to-transparent filter blur-2xl pointer-events-none" />
+          <div className="absolute top-0 left-0 w-32 h-32 bg-radial from-[#FBE116]/25 to-transparent filter blur-xl animate-pulse pointer-events-none" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-radial from-[#009E49]/25 to-transparent filter blur-xl animate-pulse pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-40 h-40 bg-radial from-[#002776]/25 to-transparent filter blur-2xl pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-40 h-40 bg-[#009E49]/10 filter blur-2xl pointer-events-none" />
           
-          {/* Corner Light beams */}
-          <div className="absolute -top-[20%] -left-[20%] w-[80%] h-[80%] bg-gradient-to-br from-white/10 via-emerald-400/5 to-transparent rotate-45 transform origin-top-left pointer-events-none mix-blend-screen" />
-          <div className="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] bg-gradient-to-bl from-white/10 via-emerald-400/5 to-transparent -rotate-45 transform origin-top-right pointer-events-none mix-blend-screen" />
+          {/* Corner Light beams - Golden stadium floodlights */}
+          <div className="absolute -top-[20%] -left-[20%] w-[80%] h-[80%] bg-gradient-to-br from-white/11 via-[#FBE116]/8 to-transparent rotate-45 transform origin-top-left pointer-events-none mix-blend-screen" />
+          <div className="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] bg-gradient-to-bl from-white/11 via-[#009E49]/8 to-transparent -rotate-45 transform origin-top-right pointer-events-none mix-blend-screen" />
 
-          {/* Pitch Lines */}
+          {/* Pitch Lines (glowing yellow/green style) */}
           <div className="absolute inset-0 p-4 pointer-events-none select-none">
-            <div className="w-full h-full border border-emerald-500/20 rounded-2xl relative select-none">
+            <div className="w-full h-full border-2 border-[#009E49]/30 rounded-2xl relative select-none">
               {/* Midfield line index */}
-              <div className="w-full h-px bg-emerald-500/20 absolute top-1/2 left-0 select-none text-transparent" />
-              <div className="w-32 h-32 border border-emerald-500/20 rounded-full absolute top-1/2 left-1/2 -ml-16 -mt-16 select-none" />
-              <div className="w-4 h-4 rounded-full bg-emerald-400/40 absolute top-1/2 left-1/2 -ml-2 -mt-2 animate-ping select-none" />
-              <div className="w-3 h-3 rounded-full bg-emerald-400/60 absolute top-1/2 left-1/2 -ml-1.5 -mt-1.5 select-none" />
+              <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-[#FBE116]/30 to-transparent absolute top-1/2 left-0 select-none text-transparent" />
+              <div className="w-32 h-32 border-2 border-[#FBE116]/30 rounded-full absolute top-1/2 left-1/2 -ml-16 -mt-16 select-none" />
+              <div className="w-4 h-4 rounded-full bg-[#FBE116]/40 absolute top-1/2 left-1/2 -ml-2 -mt-2 animate-ping select-none" />
+              <div className="w-3 h-3 rounded-full bg-[#009E49]/60 absolute top-1/2 left-1/2 -ml-1.5 -mt-1.5 select-none" />
               
               {/* Penalty Boxes */}
               {/* Goal top */}
-              <div className="w-52 h-24 border border-emerald-500/20 absolute top-0 left-1/2 -ml-26 rounded-b backdrop-blur-[1px] select-none" />
-              <div className="w-24 h-10 border border-emerald-500/30 absolute top-0 left-1/2 -ml-12 rounded-b select-none" />
+              <div className="w-52 h-24 border-2 border-[#009E49]/30 absolute top-0 left-1/2 -ml-26 rounded-b backdrop-blur-[1px] select-none" />
+              <div className="w-24 h-10 border-2 border-[#FBE116]/20 absolute top-0 left-1/2 -ml-12 rounded-b select-none" />
               {/* Goal bottom */}
-              <div className="w-52 h-24 border border-emerald-500/20 absolute bottom-0 left-1/2 -ml-26 rounded-t backdrop-blur-[1px] select-none" />
-              <div className="w-24 h-10 border border-emerald-500/30 absolute bottom-0 left-1/2 -ml-12 rounded-t select-none" />
+              <div className="w-52 h-24 border-2 border-[#009E49]/30 absolute bottom-0 left-1/2 -ml-26 rounded-t backdrop-blur-[1px] select-none" />
+              <div className="w-24 h-10 border-2 border-[#FBE116]/20 absolute bottom-0 left-1/2 -ml-12 rounded-t select-none" />
             </div>
           </div>
 
-          {/* SVG Animated Chemistry Links Canvas */}
+          {/* SVG Animated Chemistry Links Canvas - Now matches high impact green/yellow chemistry laser beams */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
             {getPitchConnections().map(conn => (
               <line
@@ -439,10 +437,10 @@ export default function PitchBuilder({
                 y1={`${conn.y1}%`}
                 x2={`${conn.x2}%`}
                 y2={`${conn.y2}%`}
-                stroke={conn.hasPlayer ? '#10b981' : 'rgba(255, 255, 255, 0.04)'}
-                strokeWidth={conn.hasPlayer ? '3' : '1.5'}
-                strokeDasharray={conn.hasPlayer ? '5,5' : 'none'}
-                className={conn.hasPlayer ? 'animate-[dash_10s_linear_infinite] filter drop-shadow-[0_0_5px_#10b981]' : ''}
+                stroke={conn.hasPlayer ? '#FBE116' : 'rgba(255, 255, 255, 0.05)'}
+                strokeWidth={conn.hasPlayer ? '4' : '1.5'}
+                strokeDasharray={conn.hasPlayer ? '8,4' : 'none'}
+                className={conn.hasPlayer ? 'animate-[dash_8s_linear_infinite] filter drop-shadow-[0_0_8px_#FBE116]' : ''}
               />
             ))}
           </svg>

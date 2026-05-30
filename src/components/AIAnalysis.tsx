@@ -230,42 +230,42 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
     <div className="w-full max-w-5xl mx-auto px-4 py-3">
       {/* 1. Empty Squad warning */}
       {!squad && (
-        <div className="bg-slate-900/60 border border-white/5 rounded-2xl p-10 text-center text-gray-400 font-mono text-xs shadow-xl backdrop-blur">
-          <Cpu className="w-10 h-10 mx-auto text-yellow-500/80 mb-3 animate-spin-slow" />
-          <h4 className="font-black text-white text-sm uppercase tracking-wider mb-2">TELEMETRY PREPARATION</h4>
+        <div className="bg-black border-2 border-black rounded-2xl p-10 text-center text-gray-400 font-mono text-xs shadow-[6px_6px_0px_#000] select-none">
+          <Cpu className="w-10 h-10 mx-auto text-[#FBE116] mb-3 animate-spin-slow" />
+          <h4 className="font-extrabold text-white text-sm uppercase tracking-wider mb-2 font-outfit">GEN AI CHAT TELEMETRY READY</h4>
           <p className="max-w-md mx-auto text-gray-400 leading-relaxed mb-4">
-            Place some of the worlds finest legends and star players on the tactical pitch, then click <b>AI SQUAD COMMENTARY</b> above to unlock real-time intelligence feeds!
+            Place some of the worlds finest legends and star players on the tactical pitch, then click <b className="text-[#FBE116]">AI SQUAD COMMENTARY</b> above to unlock real-time intelligence feeds!
           </p>
         </div>
       )}
 
       {/* 2. Loading State */}
       {squad && loading && (
-        <div className="bg-slate-900/70 border border-emerald-500/15 rounded-2xl p-12 text-center shadow-xl backdrop-blur relative overflow-hidden flex flex-col items-center">
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-transparent animate-[pulse_2s_infinite]" />
+        <div className="bg-[#050408]/90 border-2 border-black rounded-2xl p-12 text-center shadow-[6px_6px_0px_#FBE116] backdrop-blur relative overflow-hidden flex flex-col items-center">
+          <div className="absolute inset-0 bg-[#009E49]/5 animate-[pulse_2s_infinite] pointer-events-none" />
           
           <div className="relative mb-5">
-            <Cpu className="w-12 h-12 text-[#10b981] animate-spin-slow filter drop-shadow-[0_0_10px_#10b981]" />
-            <Sparkles className="w-4 h-4 text-yellow-400 absolute bottom-0 right-0 animate-bounce" />
+            <Cpu className="w-12 h-12 text-[#FBE116] animate-spin-slow filter drop-shadow-[0_0_10px_#FBE116]" />
+            <Sparkles className="w-4 h-4 text-[#009E49] absolute bottom-0 right-0 animate-bounce" />
           </div>
 
-          <h4 className="font-black text-white text-sm uppercase tracking-widest mb-2">
-            INTELLIGENCE TELEMETRY BUSY
+          <h4 className="font-black text-white text-sm uppercase tracking-widest mb-2 font-outfit italic">
+            🇧🇷 CALIBRATING TACTICAL AURA DEBATE
           </h4>
           
-          <div className="text-xs text-slate-400 font-mono italic max-w-sm h-6 overflow-hidden">
+          <div className="text-xs text-slate-300 font-mono italic max-w-sm h-6 overflow-hidden">
             {loadingMessages[loadingStep]}
           </div>
 
-          <div className="w-48 bg-slate-800 rounded-full h-1.5 mt-6 overflow-hidden">
-            <div className="bg-gradient-to-r from-emerald-500 to-green-300 h-1.5 rounded-full animate-[loading_1.5s_infinite]" style={{ width: '40%' }} />
+          <div className="w-48 bg-black rounded-full h-2.5 mt-6 border-2 border-black overflow-hidden pointer-events-none">
+            <div className="bg-[#FBE116] h-full rounded-full animate-[loading_1.5s_infinite]" style={{ width: '40%' }} />
           </div>
         </div>
       )}
 
       {/* 3. Error state */}
       {squad && !loading && errorCode && (
-        <div className="bg-slate-900 border border-red-500/20 rounded-2xl p-6 text-center text-rose-400 font-mono text-xs">
+        <div className="bg-black border-2 border-red-500 rounded-2xl p-6 text-center text-rose-400 font-mono text-xs">
           <ShieldAlert className="w-8 h-8 text-red-500 mx-auto mb-2 animate-bounce" />
           <p className="font-bold uppercase tracking-wider mb-1">Telemetry Loop Interrupted</p>
           <p className="text-gray-400">{errorCode}</p>
@@ -277,45 +277,45 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 md:grid-cols-12 gap-6 bg-slate-900/80 border border-white/5 p-6 rounded-2xl backdrop-blur shadow-2xl relative overflow-hidden"
+          className="grid grid-cols-1 md:grid-cols-12 gap-6 bg-black border-2 border-black p-6 rounded-2xl backdrop-blur shadow-[8px_8px_0px_#009E49] relative overflow-hidden text-left"
         >
           {/* Subtle background graphics */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-radial from-[#10b981]/5 to-transparent pointer-events-none select-none" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-radial from-[#FBE116]/10 to-transparent pointer-events-none select-none" />
 
           {/* Core Commentary Header */}
-          <div className="md:col-span-12 pb-5 border-b border-white/5 flex flex-col sm:flex-row items-start gap-4 justify-between">
+          <div className="md:col-span-12 pb-5 border-b-2 border-black flex flex-col sm:flex-row items-start gap-4 justify-between">
             <div className="flex-1">
-              <span className="text-[10px] text-emerald-400 font-black uppercase tracking-widest flex items-center gap-1.5 mb-1 select-none">
+              <span className="text-[10px] text-black font-extrabold bg-[#009E49] text-white px-2.5 py-1 rounded border border-black uppercase tracking-widest flex items-center gap-1.5 mb-2.5 select-none w-fit">
                 <Wand2 className="w-3.5 h-3.5 animate-pulse" />
-                GEMINI AI TACTICAL REPORT
+                🇧🇷 CHAT DOS CRISTAL • UNFILTERED AI REPORT
               </span>
-              <h2 className="text-lg font-black text-white uppercase tracking-tight mb-2">
-                ANALYSIS FOR: {squad.name}
+              <h2 className="text-xl font-black text-white uppercase tracking-tight font-outfit mb-2">
+                GAFFER REVIEW: {squad.name}
               </h2>
-              <p className="text-xs text-gray-300 leading-relaxed font-mono">
+              <p className="text-sm text-gray-200 leading-relaxed font-sans">
                 {result.comment}
               </p>
             </div>
 
             {/* Combined Football Aura Meter */}
-            <div className="bg-gradient-to-br from-emerald-950/30 to-slate-900 border border-emerald-500/20 rounded-2xl p-4 sm:w-60 w-full shrink-0 flex flex-col justify-center">
+            <div className="bg-neutral-950 border-2 border-black rounded-xl p-4 sm:w-65 w-full shrink-0 flex flex-col justify-center">
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-[10px] text-gray-400 font-mono uppercase tracking-widest text-[9px]">SQUAD AURA SCORE:</span>
-                <span className="text-xl font-black text-[#10b981]">{result.aura}%</span>
+                <span className="text-[9px] text-[#FBE116] font-mono uppercase tracking-wider font-bold">STREET AURA CERT:</span>
+                <span className="text-xl font-black text-[#FBE116] font-graffiti">{result.aura}%</span>
               </div>
-              <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                <div className="bg-gradient-to-r from-emerald-500 to-green-300 h-1.5 rounded-full filter drop-shadow-[0_0_2px_#10b981]" style={{ width: `${result.aura}%` }} />
+              <div className="w-full bg-black rounded-full h-2 border border-black overflow-hidden">
+                <div className="bg-gradient-to-r from-[#FBE116] to-[#009E49] h-full rounded-full" style={{ width: `${result.aura}%` }} />
               </div>
-              <p className="text-[9px] text-gray-400 leading-relaxed font-mono mt-2 italic select-none">
+              <p className="text-[10px] text-gray-400 leading-relaxed font-mono mt-2 italic select-none">
                 💬 {result.auraComment}
               </p>
             </div>
           </div>
 
           {/* Radar Chart (Col 1) */}
-          <div className="md:col-span-4 flex items-center justify-center bg-black/40 border border-white/5 p-4 rounded-xl">
+          <div className="md:col-span-4 flex items-center justify-center bg-zinc-950 border-2 border-black p-4 rounded-xl">
             <div className="w-full flex flex-col items-center">
-              <span className="text-[10px] text-gray-400 font-mono uppercase tracking-widest block mb-1">TACTICAL WEB MATRIX</span>
+              <span className="text-[10px] text-gray-400 font-mono uppercase tracking-widest block mb-1">STREET RADAR RATINGS</span>
               {renderRadarChart(result.ratings)}
             </div>
           </div>
@@ -323,46 +323,46 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
           {/* Strengths & Weaknesses (Col 2) */}
           <div className="md:col-span-8 flex flex-col gap-4 font-mono text-xs">
             {/* Strengths Grid card */}
-            <div className="bg-black/30 border border-emerald-500/10 rounded-xl p-4">
-              <h4 className="text-[11px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 mb-3 select-none">
+            <div className="bg-zinc-950 border-2 border-[#009E49]/30 rounded-xl p-4">
+              <h4 className="text-[11px] font-black text-[#009E49] uppercase tracking-widest flex items-center gap-1.5 mb-3 select-none font-outfit">
                 <CheckCircle2 className="w-4 h-4" />
                 TACTICAL STRENGTHS
               </h4>
-              <ul className="flex flex-col gap-2 list-none">
+              <ul className="flex flex-col gap-2 list-none text-left">
                 {result.strengths.map((str, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-gray-300">
-                    <span className="text-emerald-500 text-sm leading-none mt-0.5">•</span>
-                    <span>{str}</span>
+                  <li key={idx} className="flex items-start gap-2 text-gray-200">
+                    <span className="text-[#009E49] text-base leading-none mt-0.5">•</span>
+                    <span className="font-sans text-sm">{str}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Weaknesses Grid card */}
-            <div className="bg-black/30 border border-yellow-500/10 rounded-xl p-4">
-              <h4 className="text-[11px] font-black text-yellow-500 uppercase tracking-widest flex items-center gap-1.5 mb-3 select-none">
+            <div className="bg-zinc-950 border-2 border-[#FBE116]/30 rounded-xl p-4">
+              <h4 className="text-[11px] font-black text-[#FBE116] uppercase tracking-widest flex items-center gap-1.5 mb-3 select-none font-outfit">
                 <AlertTriangle className="w-4 h-4" />
                 POTENTIAL EXPOSURES
               </h4>
-              <ul className="flex flex-col gap-2 list-none">
+              <ul className="flex flex-col gap-2 list-none text-left">
                 {result.weaknesses.map((weak, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-gray-300">
-                    <span className="text-yellow-500 text-sm leading-none mt-0.5">•</span>
-                    <span>{weak}</span>
+                  <li key={idx} className="flex items-start gap-2 text-gray-200">
+                    <span className="text-[#FBE116] text-base leading-none mt-0.5">•</span>
+                    <span className="font-sans text-sm">{weak}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Suggestions Advice strip */}
-            <div className="p-4 bg-[#eab308]/5 border border-[#eab308]/10 rounded-xl">
-              <h4 className="text-[11px] font-black text-[#eab308] uppercase tracking-widest flex items-center gap-1.5 mb-2.5 select-none">
-                <Lightbulb className="w-4 h-4" />
-                TACTICAL INSTRUCTIONS (LOCKS)
+            <div className="p-4 bg-orange-950/20 border-2 border-[#FBE116]/20 rounded-xl">
+              <h4 className="text-[11px] font-black text-[#FBE116] uppercase tracking-widest flex items-center gap-1.5 mb-2.5 select-none font-outfit">
+                <Lightbulb className="w-4 h-4 text-amber-300" />
+                STREET LOCK TACTICAL INSTRUCTIONS
               </h4>
-              <ul className="flex flex-col gap-1.5 list-none">
+              <ul className="flex flex-col gap-1.5 list-none text-left">
                 {result.suggestions.map((sug, idx) => (
-                  <li key={idx} className="text-gray-300">
+                  <li key={idx} className="text-gray-200 text-sm">
                     💡 <span className="font-sans leading-relaxed">{sug}</span>
                   </li>
                 ))}

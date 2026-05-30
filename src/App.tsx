@@ -418,41 +418,66 @@ export default function App() {
   return (
     <div className="min-h-screen custom-grid-bg text-slate-100 flex flex-col font-sans select-none antialiased relative pb-20 sm:pb-8">
       
+      {/* Spraypaint paint splash overlays */}
+      <div className="spray-overlay" />
+
+      {/* Floating Retro Brazil Sports Stickers Collectibles */}
+      <div className="absolute top-[180px] left-[2%] z-50 pointer-events-none hidden xl:block animate-float">
+        <div className="street-sticker-brazil">
+          🇧🇷 JOGA BONITO
+        </div>
+      </div>
+      <div className="absolute top-[480px] right-[2%] z-50 pointer-events-none hidden xl:block animate-float-slow">
+        <div className="street-sticker">
+          🔥 +99 AURA index
+        </div>
+      </div>
+      <div className="absolute top-[820px] left-[1.5%] z-50 pointer-events-none hidden xl:block animate-float-fast">
+        <div className="street-sticker-brazil rotate-[-8deg] shadow-emerald-500/30 shadow-lg">
+          ⚽ COPA DE RUA
+        </div>
+      </div>
+      <div className="absolute top-[340px] left-[84%] z-50 pointer-events-none hidden xl:block animate-float">
+        <div className="street-sticker rotate-[15deg]">
+          💯 HE COOKED
+        </div>
+      </div>
+
       {/* Heavy colorful glowing neon ambient backdrops */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none select-none" />
-      <div className="absolute top-1/4 right-1/4 w-[650px] h-[450px] bg-purple-500/10 blur-[140px] rounded-full pointer-events-none select-none" />
-      <div className="absolute top-1/2 left-1/3 w-[500px] h-[500px] bg-pink-500/5 blur-[150px] rounded-full pointer-events-none select-none" />
+      <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#FBE116]/10 blur-[130px] rounded-full pointer-events-none select-none" />
+      <div className="absolute top-1/4 right-1/4 w-[650px] h-[450px] bg-[#009E49]/15 blur-[140px] rounded-full pointer-events-none select-none" />
+      <div className="absolute top-1/2 left-1/3 w-[500px] h-[500px] bg-[#002776]/10 blur-[150px] rounded-full pointer-events-none select-none" />
 
       {/* 1. Header Navigation Bar */}
-      <header className="border-b border-white/10 bg-[#0B0B0F]/90 backdrop-blur sticky top-0 z-30 select-none">
+      <header className="border-b-[3px] border-black bg-[#0B0B0F]/90 backdrop-blur sticky top-0 z-30 select-none shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
         <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between flex-wrap gap-4">
           
           {/* Logo Brand Title */}
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => handleTabChange('builder')}>
-            <span className="bg-gradient-to-tr from-emerald-400 via-purple-500 to-pink-500 p-2.5 rounded-2xl text-black shadow-[0_0_20px_rgba(236,72,153,0.3)] group-hover:scale-105 transition-all duration-300">
+            <span className="bg-[#FBE116] p-2.5 rounded-2xl text-black border-2 border-black shadow-[4px_4px_0px_#009E49] group-hover:scale-115 group-hover:rotate-6 transition-all duration-300">
               <Trophy className="w-5 h-5 text-black fill-black" />
             </span>
             <div className="leading-none">
-              <h1 className="text-lg font-black tracking-tighter text-white flex items-center gap-1">
-                DREAM XI <span className="text-[10px] text-yellow-400 font-mono tracking-widest bg-yellow-400/10 px-1.5 py-0.5 rounded leading-none">LABS</span>
-              </h1>
-              <p className="text-[9px] text-emerald-400 font-mono tracking-wider font-black uppercase mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> LIVE STADIUM FEED
+              <h2 className="text-xl font-black tracking-tighter text-white flex items-center gap-1 font-outfit uppercase italic">
+                DREAM XI <span className="text-[10px] text-white font-mono font-black tracking-widest bg-[#009E49] px-2 py-0.5 rounded leading-none border border-black">JOGA LABS</span>
+              </h2>
+              <p className="text-[9px] text-[#FBE116] font-mono tracking-wider font-black uppercase mt-1 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#009E49] animate-pulse" /> RIO DE JANEIRO STREETS
               </p>
             </div>
           </div>
 
           {/* Activity status ticker bento box */}
-          <div className="hidden md:flex items-center gap-5 font-mono text-[10px] text-gray-300 uppercase leading-none bg-white/5 border border-white/10 px-4 py-2.5 rounded-2xl backdrop-blur-md">
+          <div className="hidden md:flex items-center gap-5 font-mono text-[10px] text-gray-300 uppercase leading-none bg-[#0B0B0F] border-2 border-black street-shadow-yellow px-4 py-2.5 rounded-2xl">
             <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-              STATUS: <strong className="text-white">COOKING</strong>
+              <Sparkles className="w-3.5 h-3.5 text-[#FBE116] animate-spin" />
+              STATUS: <strong className="text-white bg-[#009E49] text-white px-1.5 py-0.5 rounded text-[8px] tracking-tighter">🇧🇷 JOGA BONITO</strong>
             </span>
             <span className="flex items-center gap-1.5 border-l border-white/10 pl-5">
-              👑 STREAK: <strong className="text-yellow-400">Level 4</strong>
+              👑 STREAK: <strong className="text-[#FBE116]">Level 4</strong>
             </span>
             <span className="flex items-center gap-1.5 border-l border-white/10 pl-5">
-              🔥 ARENAS: <strong className="text-pink-400">{battles.length} active</strong>
+              🔥 DEBATES: <strong className="text-pink-400">{battles.length} active</strong>
             </span>
           </div>
 
@@ -478,7 +503,7 @@ export default function App() {
                     playFutSound('click');
                     setActiveTab('profile'); // Switch to profile page which prompts login
                   }}
-                  className="px-3.5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 transition font-black uppercase cursor-pointer"
+                  className="px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border-2 border-black transition font-black uppercase cursor-pointer"
                   id="header-login-btn"
                 >
                   Login
@@ -488,7 +513,7 @@ export default function App() {
                     playFutSound('click');
                     setActiveTab('profile'); // Switch to profile page which prompts login
                   }}
-                  className="px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:scale-105 active:scale-95 text-black font-sans font-black uppercase transition cursor-pointer shadow-[0_0_10px_rgba(52,211,153,0.2)]"
+                  className="px-3.5 py-2.5 rounded-xl bg-[#FBE116] text-black hover:scale-105 active:scale-95 border-2 border-black font-sans font-black uppercase transition cursor-pointer shadow-[3px_3px_0px_#000]"
                   id="header-signup-btn"
                 >
                   Sign Up
@@ -500,39 +525,43 @@ export default function App() {
       </header>
 
       {/* 2. TikTok Meets FIFA Spectacular Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-16 px-4 border-b border-white/10 bg-gradient-to-b from-purple-950/10 via-black/40 to-[#0B0B0F]/60">
+      <section className="relative overflow-hidden pt-12 pb-16 px-4 border-b-2 border-black bg-gradient-to-b from-[#009E49]/5 via-black/40 to-[#050408]/80 select-none">
+        
+        {/* Dynamic diagonal stripe texture */}
+        <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,rgba(0,158,73,0.015),rgba(0,158,73,0.015)_20px,transparent_20px,transparent_40px)] pointer-events-none" />
+
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           
           {/* Hero Left Content Column */}
           <div className="lg:col-span-7 flex flex-col justify-center leading-none text-left select-none relative z-10">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full text-[10px] font-mono font-black text-emerald-400 uppercase tracking-widest mb-6 w-fit animate-pulse">
-              <Flame className="w-4 h-4 text-emerald-400" /> Gen Z Football Headquarters
+            <div className="inline-flex items-center gap-2 bg-[#009E49]/20 border-2 border-[#009E49] px-3.5 py-1.5 rounded-xl text-[10px] font-mono font-black text-[#FBE116] uppercase tracking-widest mb-6 w-fit animate-pulse rotate-[-1.5deg]">
+              <Flame className="w-4 h-4 text-[#FBE116]" /> 🇧🇷 Copacabana Street Certified
             </div>
             
-            <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tighter leading-none uppercase mb-6 drop-shadow-md">
-              Build The Squad <br /> 
-              <span className="bg-gradient-to-r from-emerald-400 via-purple-400 to-pink-500 bg-clip-text text-transparent">
-                Everyone Will Argue About.
+            <h1 className="text-4xl sm:text-7xl font-black text-white tracking-tighter leading-none uppercase mb-6 drop-shadow-md font-outfit italic">
+              DRAFT THE XI <br /> 
+              <span className="bg-gradient-to-r from-[#FBE116] via-[#009E49] to-[#00efff] bg-clip-text text-transparent italic">
+                EVERYONE WILL ARGUE ABOUT.
               </span>
             </h1>
 
             <p className="text-slate-300 text-sm sm:text-base font-medium font-sans leading-relaxed tracking-tight max-w-xl mb-8">
-              Create your Dream XI lineups with absolute custom tactics. Pitch your team in match simulations, trigger real-time expert AI analysis, vote in live debate face-offs, and showcase your sovereign coach Aura Score.
+              Create your Dream XI lineups with raw asphalt tactics. Pitch your team in live match simulations, grab unfiltered expert AI gaffer takes, trigger interactive social feed debates, and prove your sovereign coach Aura Score.
             </p>
 
-            {/* Micro Engagement Stats Grid */}
+            {/* Micro Engagement Stats Grid - Panini Sticker vibe boxes */}
             <div className="grid grid-cols-3 gap-4 max-w-lg mb-8">
-              <div className="bg-[#0B0B0F]/60 border border-white/5 p-4 rounded-2xl relative overflow-hidden backdrop-blur">
-                <div className="text-2xl sm:text-3xl font-black text-emerald-400">99+</div>
-                <div className="text-[10px] text-gray-400 uppercase font-mono mt-1 font-bold">Aura Capacity</div>
+              <div className="bg-black/80 border-2 border-black street-shadow-yellow p-4 rounded-xl relative overflow-hidden backdrop-blur">
+                <div className="text-2xl sm:text-3xl font-black text-[#FBE116] font-graffiti">99+</div>
+                <div className="text-[9px] text-[#009E49] uppercase font-mono mt-1 font-black">Aura Cap</div>
               </div>
-              <div className="bg-[#0B0B0F]/60 border border-white/5 p-4 rounded-2xl relative overflow-hidden backdrop-blur">
-                <div className="text-2xl sm:text-3xl font-black text-purple-400">100%</div>
-                <div className="text-[10px] text-gray-400 uppercase font-mono mt-1 font-bold">Unfiltered Takes</div>
+              <div className="bg-black/80 border-2 border-black street-shadow-green p-4 rounded-xl relative overflow-hidden backdrop-blur">
+                <div className="text-2xl sm:text-3xl font-black text-[#009E49] font-graffiti">100%</div>
+                <div className="text-[9px] text-gray-400 uppercase font-mono mt-1 font-black">Raw Debates</div>
               </div>
-              <div className="bg-[#0B0B0F]/60 border border-white/5 p-4 rounded-2xl relative overflow-hidden backdrop-blur">
-                <div className="text-2xl sm:text-3xl font-black text-pink-400">Live</div>
-                <div className="text-[10px] text-gray-400 uppercase font-mono mt-1 font-bold">Vibe Battleground</div>
+              <div className="bg-black/80 border-2 border-black street-shadow-blue p-4 rounded-xl relative overflow-hidden backdrop-blur">
+                <div className="text-2xl sm:text-3xl font-black text-sky-400 font-graffiti">Live</div>
+                <div className="text-[9px] text-[#FBE116] uppercase font-mono mt-1 font-black">Joga Vibe</div>
               </div>
             </div>
 
@@ -540,15 +569,15 @@ export default function App() {
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => handleTabChange('builder')}
-                className="px-6 py-4 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 text-black font-black uppercase text-xs tracking-wider rounded-2xl hover:scale-105 active:scale-95 transition shadow-[0_0_25px_rgba(34,197,94,0.4)] cursor-pointer"
+                className="px-6 py-4 bg-gradient-to-r from-[#FBE116] to-[#009E49] text-black border-2 border-black font-black uppercase text-xs tracking-wider rounded-xl hover:scale-105 active:scale-95 transition shadow-[4px_4px_0px_#000] cursor-pointer"
               >
-                🔥 Start Drafting My XI
+                🔥 DRAFT MY SQUAD
               </button>
               <button
                 onClick={() => handleTabChange('feed')}
-                className="px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black uppercase text-xs tracking-wider rounded-2xl transition cursor-pointer"
+                className="px-6 py-4 bg-white/5 hover:bg-white/10 border-2 border-black text-white font-black uppercase text-xs tracking-wider rounded-xl transition cursor-pointer"
               >
-                📢 Read Trench Takes
+                📢 VIEW TRENCH TAKES
               </button>
             </div>
           </div>
@@ -556,20 +585,20 @@ export default function App() {
           {/* Hero Right Column: Spectacular Floating Collectible Cards */}
           <div className="lg:col-span-5 relative h-[380px] flex items-center justify-center select-none mt-6 lg:mt-0">
             {/* Live stadium vibe circular backing */}
-            <div className="absolute w-[320px] h-[320px] rounded-full bg-gradient-to-tr from-purple-500/20 to-pink-500/20 blur-3xl animate-spin-slow pointer-events-none" />
+            <div className="absolute w-[320px] h-[320px] rounded-full bg-gradient-to-tr from-[#009E49]/20 to-[#FBE116]/20 blur-3xl animate-spin-slow pointer-events-none" />
 
             {/* Card 1 Floating left */}
-            <div className="absolute left-2 top-4 select-none transform -rotate-12 hover:rotate-0 hover:z-30 transition-all duration-300 animate-float-slow origin-bottom-left">
+            <div className="absolute left-2 top-4 select-none transform -rotate-12 hover:rotate-2 hover:scale-105 hover:z-30 transition-all duration-300 animate-float-slow origin-bottom-left">
               <HolographicCard player={HERO_SHOWCASE_PLAYERS[2]} size="sm" showStats={false} />
             </div>
 
             {/* Card 2 Floating center foreground */}
-            <div className="absolute z-20 top-8 select-none scale-105 hover:scale-110 transition-all duration-300 animate-float origin-center shadow-[0_15px_35px_rgba(0,0,0,0.8)]">
+            <div className="absolute z-20 top-8 select-none scale-105 hover:scale-110 hover:-rotate-2 transition-all duration-300 animate-float origin-center shadow-[0_20px_45px_rgba(0,0,0,0.9)]">
               <HolographicCard player={HERO_SHOWCASE_PLAYERS[0]} size="md" showStats={true} />
             </div>
 
             {/* Card 3 Floating right */}
-            <div className="absolute right-2 top-10 select-none transform rotate-12 hover:rotate-0 hover:z-30 transition-all duration-300 animate-float-fast origin-bottom-right">
+            <div className="absolute right-2 top-10 select-none transform rotate-12 hover:rotate-[-2deg] hover:scale-105 hover:z-30 transition-all duration-300 animate-float-fast origin-bottom-right">
               <HolographicCard player={HERO_SHOWCASE_PLAYERS[1]} size="sm" showStats={false} />
             </div>
           </div>
@@ -577,16 +606,16 @@ export default function App() {
         </div>
       </section>
 
-      {/* 3. Segmented Navigation Bar - Premium Pill Capsules */}
-      <nav id="navigation-root" className="border-b border-white/10 bg-[#0B0B0F]/80 py-4 select-none sticky top-[66px] z-20 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 flex gap-2.5 overflow-x-auto font-mono text-xs whitespace-nowrap scrollbar-none items-center justify-start sm:justify-center">
+      {/* 3. Segmented Navigation Bar - Joga Bonito Slab Buttons */}
+      <nav id="navigation-root" className="border-b-[3px] border-black bg-[#050408]/90 py-4 select-none sticky top-[66px] z-20 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 flex gap-3 overflow-x-auto font-mono text-xs whitespace-nowrap scrollbar-none items-center justify-start sm:justify-center">
           
           <button
             onClick={() => handleTabChange('builder')}
-            className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer flex items-center gap-2 ${
+            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
               activeTab === 'builder'
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-black shadow-[0_0_15px_rgba(34,197,94,0.4)]'
-                : 'bg-white/5 text-gray-300 border border-white/5 hover:text-white hover:bg-white/10'
+                ? 'bg-[#FBE116] text-[#050408] shadow-[4px_4px_0px_#009E49] rotate-[-2deg]'
+                : 'bg-black/60 text-gray-300 hover:text-[#FBE116] hover:bg-black'
             }`}
           >
             📋 Tactical Pitch
@@ -594,10 +623,10 @@ export default function App() {
 
           <button
             onClick={() => handleTabChange('feed')}
-            className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer flex items-center gap-2 ${
+            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
               activeTab === 'feed'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]'
-                : 'bg-white/5 text-gray-300 border border-white/5 hover:text-white hover:bg-white/10'
+                ? 'bg-[#009E49] text-white shadow-[4px_4px_0px_#002776] rotate-[1.5deg]'
+                : 'bg-black/60 text-gray-300 hover:text-[#009E49] hover:bg-black'
             }`}
           >
             📢 Trench Feed
@@ -605,10 +634,10 @@ export default function App() {
 
           <button
             onClick={() => handleTabChange('arena')}
-            className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer flex items-center gap-2 ${
+            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
               activeTab === 'arena'
-                ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-[0_0_15px_rgba(236,72,153,0.4)]'
-                : 'bg-white/5 text-gray-300 border border-white/5 hover:text-white hover:bg-white/10'
+                ? 'bg-[#002776] text-white shadow-[4px_4px_0px_#ec4899] rotate-[-1.5deg]'
+                : 'bg-black/60 text-gray-300 hover:text-[#002776] hover:bg-black'
             }`}
           >
             ⚔️ Live Debates
@@ -616,10 +645,10 @@ export default function App() {
 
           <button
             onClick={() => handleTabChange('simulator')}
-            className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer flex items-center gap-2 ${
+            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
               activeTab === 'simulator'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.4)]'
-                : 'bg-white/5 text-gray-300 border border-white/5 hover:text-white hover:bg-white/10'
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[4px_4px_0px_#000] rotate-[1deg]'
+                : 'bg-black/60 text-gray-300 hover:text-cyan-400 hover:bg-black'
             }`}
           >
             🤖 Match Sims
@@ -627,10 +656,10 @@ export default function App() {
 
           <button
             onClick={() => handleTabChange('database')}
-            className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer flex items-center gap-2 ${
+            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
               activeTab === 'database'
-                ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]'
-                : 'bg-white/5 text-gray-300 border border-white/5 hover:text-white hover:bg-white/10'
+                ? 'bg-[#FBE116] text-[#050408] shadow-[4px_4px_0px_#000] rotate-[-2deg]'
+                : 'bg-black/60 text-gray-300 hover:text-yellow-400 hover:bg-black'
             }`}
           >
             🔍 Star DB
@@ -638,10 +667,10 @@ export default function App() {
 
           <button
             onClick={() => handleTabChange('leaderboards')}
-            className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer flex items-center gap-2 ${
+            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
               activeTab === 'leaderboards'
-                ? 'bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
-                : 'bg-white/5 text-gray-300 border border-white/5 hover:text-white hover:bg-white/10'
+                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-[4px_4px_0px_#FBE116] rotate-[1.5deg]'
+                : 'bg-black/60 text-gray-300 hover:text-orange-400 hover:bg-black'
             }`}
           >
             🏆 Rankings
@@ -649,13 +678,13 @@ export default function App() {
 
           <button
             onClick={() => handleTabChange('profile')}
-            className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer flex items-center gap-2 ${
+            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
               activeTab === 'profile'
-                ? 'bg-gradient-to-r from-[#22c55e] to-sky-400 text-black shadow-[0_0_15px_rgba(34,197,94,0.3)]'
-                : 'bg-white/5 text-gray-300 border border-white/5 hover:text-white hover:bg-white/10'
+                ? 'bg-[#009E49] text-white shadow-[4px_4px_0px_#FBE116] rotate-[-1deg]'
+                : 'bg-black/60 text-gray-300 hover:text-emerald-400 hover:bg-black'
             }`}
           >
-            👤 Premium profile
+            👤 Joga Profile
           </button>
 
         </div>

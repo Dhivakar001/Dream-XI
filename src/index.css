@@ -1,48 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;500;700;900&family=Permanent+Marker&family=Rubik+Mono+One&family=Outfit:wght@800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Space Grotesk", "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --font-graffiti: "Permanent Marker", cursive;
+  --font-ultra: "Rubik Mono One", sans-serif;
+  --font-outfit: "Outfit", sans-serif;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(1deg); }
+  0%, 100% { transform: translateY(0px) rotate(-1deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
 }
 
-@keyframes float-slower {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(-1deg); }
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(1deg); }
+  50% { transform: translateY(-20px) rotate(-3deg); }
 }
 
-@keyframes float-faster {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-5px) rotate(2deg); }
+@keyframes float-fast {
+  0%, 100% { transform: translateY(0px) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.3; filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.4)); }
-  50% { opacity: 0.8; filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.8)); }
-}
-
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  0%, 100% { opacity: 0.3; filter: drop-shadow(0 0 5px rgba(251, 225, 22, 0.4)); }
+  50% { opacity: 0.9; filter: drop-shadow(0 0 20px rgba(0, 158, 73, 0.8)); }
 }
 
 @keyframes holo-shine {
-  0% { transform: translate(-100%, -100%) rotate(45deg); opacity: 0; }
-  20% { opacity: 0.5; }
-  60% { opacity: 0.5; }
-  100% { transform: translate(100%, 100%) rotate(45deg); opacity: 0; }
-}
-
-@keyframes flow-border {
-  0%, 100% { border-color: #22c55e; }
-  25% { border-color: #a855f7; }
-  50% { border-color: #3b82f6; }
-  75% { border-color: #ec4899; }
+  0% { transform: translate(-150%, -150%) rotate(45deg); opacity: 0; }
+  15% { opacity: 0.7; }
+  45% { opacity: 0.7; }
+  105% { transform: translate(150%, 150%) rotate(45deg); opacity: 0; }
 }
 
 @keyframes grid-move {
@@ -50,61 +41,160 @@
   100% { background-position: 40px 40px; }
 }
 
-.animate-spin-slow {
-  animation: spin-slow 16s linear infinite;
+@keyframes drift {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
 }
 
+@keyframes stamp-enter {
+  0% { transform: scale(3) rotate(-35deg); opacity: 0; }
+  100% { transform: scale(1) rotate(-8deg); opacity: 1; }
+}
+
+/* Custom classes for the Brazilian Street Football meets Nike Joga Bonito Look */
 .animate-float {
-  animation: float 4.5s ease-in-out infinite;
+  animation: float 4s ease-in-out infinite;
 }
 
 .animate-float-slow {
-  animation: float-slower 7s ease-in-out infinite;
+  animation: float-slow 7.5s ease-in-out infinite;
 }
 
 .animate-float-fast {
-  animation: float-faster 3s ease-in-out infinite;
+  animation: float-fast 3s ease-in-out infinite;
 }
 
 .animate-holo-shine {
   animation: holo-shine 4s ease-in-out infinite;
 }
 
+/* Street Graffiti Textured Background */
 .custom-grid-bg {
-  background-color: #0B0B0F;
+  background-color: #050408;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 20px 20px;
-  animation: grid-move 20s linear infinite;
+    linear-gradient(rgba(251, 225, 22, 0.015) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(0, 158, 73, 0.015) 1.5px, transparent 1.5px);
+  background-size: 30px 30px;
+  animation: grid-move 30s linear infinite;
+  position: relative;
 }
 
-.neobrutal-shadow {
-  box-shadow: 4px 4px 0px 0px #22c55e;
+/* Spraypaint grunge textures */
+.spray-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(251, 225, 22, 0.02) 2px, transparent 0);
+  background-size: 24px 24px;
+  opacity: 0.7;
+  z-index: 1;
 }
 
-.neobrutal-shadow-purple {
-  box-shadow: 4px 4px 0px 0px #a855f7;
+/* Street Panini Stickers Style */
+.street-sticker {
+  background: #fbfbeb;
+  color: #0a0a0c;
+  border: 3px solid #000000;
+  box-shadow: 6px 6px 0px #FBE116;
+  font-family: "Rubik Mono One", sans-serif;
+  padding: 0.5rem 1rem;
+  transform: rotate(-3deg);
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  transition: all 0.2s ease-in-out;
+  user-select: none;
 }
 
-.neobrutal-shadow-pink {
+.street-sticker:hover {
+  transform: rotate(1deg) scale(1.05);
+  box-shadow: 8px 8px 0px #009E49;
+  background-color: #ffd;
+}
+
+/* Green-Yellow Gradient stickers */
+.street-sticker-brazil {
+  background: linear-gradient(135deg, #FBE116 0%, #009E49 100%);
+  color: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: 6px 6px 0px #002776;
+  font-family: "Rubik Mono One", sans-serif;
+  transform: rotate(2deg);
+  font-size: 0.7rem;
+}
+
+/* Nike Joga Bonito Black/White stripe hazard pattern */
+.hazard-border {
+  background: repeating-linear-gradient(
+    -45deg,
+    #FBE116,
+    #FBE116 10px,
+    #000000 10px,
+    #000000 20px
+  );
+}
+
+.hazard-border-green {
+  background: repeating-linear-gradient(
+    -45deg,
+    #009E49,
+    #009E49 10px,
+    #000000 10px,
+    #000000 20px
+  );
+}
+
+/* Graffiti drip marker font styles */
+.graffiti-tag {
+  font-family: "Permanent Marker", cursive;
+  text-shadow: 3px 3px 0px #000;
+}
+
+/* Sharp high contrast shadow system block */
+.street-shadow-yellow {
+  box-shadow: 4px 4px 0px 0px #FBE116;
+  border: 2px solid #000000;
+}
+
+.street-shadow-green {
+  box-shadow: 4px 4px 0px 0px #009E49;
+  border: 2px solid #000000;
+}
+
+.street-shadow-blue {
+  box-shadow: 4px 4px 0px 0px #002776;
+  border: 2px solid #000000;
+}
+
+.street-shadow-pink {
   box-shadow: 4px 4px 0px 0px #ec4899;
+  border: 2px solid #000000;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar matching Brazil & street football style */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B0B0F;
+  background: #050408;
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #22c55e 0%, #a855f7 100%);
-  border-radius: 9999px;
-  border: 2px solid #0B0B0F;
+  background: linear-gradient(180deg, #FBE116 0%, #009E49 100%);
+  border-radius: 4px;
+  border: 2px solid #050408;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #4ade80 0%, #c084fc 100%);
+  background: linear-gradient(180deg, #ffe01a 0%, #00b855 100%);
 }
 
+/* FUT pack opening sparkle particles */
+.sparkle-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.sparkle-fast {
+  animation: float-fast 4s ease-in-out infinite;
+}
