@@ -26,6 +26,7 @@ import { useAuth } from './hooks/useAuth';
 import LoginPage from './app/login/page';
 import SignupPage from './app/signup/page';
 import { loadSquadsFromCloud } from './lib/supabaseDb';
+import { supabase } from './lib/supabase';
 
 // Import Modular Components
 import PitchBuilder from './components/PitchBuilder';
@@ -122,6 +123,58 @@ export default function App() {
       setProfile(authProfile);
     }
   }, [authProfile]);
+
+  // Listen for Google Auth success from popup window
+  useEffect(() => {
+    const handleOAuthMessage = async (event: MessageEvent) => {
+      const origin = event.origin;
+      if (!origin.endsWith('.run.app') && !origin.includes('localhost') && !origin.includes('127.0.0.1')) {
+        return;
+      }
+
+      if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
+        const { hash, search } = event.data;
+        try {
+          if (search) {
+            const params = new URLSearchParams(search);
+            const code = params.get('code');
+            if (code) {
+              const { error } = await supabase.auth.exchangeCodeForSession(code);
+              if (error) {
+                console.error('Error exchanging code for session:', error.message);
+              } else {
+                console.log('Successfully completed PKCE OAuth session exchange.');
+              }
+            }
+          }
+          
+          if (hash) {
+            const hashParams = new URLSearchParams(hash.substring(1));
+            const access_token = hashParams.get('access_token');
+            const refresh_token = hashParams.get('refresh_token');
+            if (access_token && refresh_token) {
+              const { error } = await supabase.auth.setSession({
+                access_token,
+                refresh_token
+              });
+              if (error) {
+                console.error('Error setting OAuth session from hash:', error.message);
+              } else {
+                console.log('Successfully completed Implicit OAuth session set.');
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Failed to parse and complete OAuth session:', err);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleOAuthMessage);
+    return () => {
+      window.removeEventListener('message', handleOAuthMessage);
+    };
+  }, []);
 
   // Load all telemetry endpoints concurrently on startup
   useEffect(() => {

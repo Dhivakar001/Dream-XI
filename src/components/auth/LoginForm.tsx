@@ -87,14 +87,29 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
     setErrorMsg('');
     try {
       playFutSound('click');
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin
+          redirectTo: `${window.location.origin}/auth/callback`,
+          skipBrowserRedirect: true
         }
       });
       if (error) {
         setErrorMsg(error.message);
+        return;
+      }
+      if (data?.url) {
+        // Open the google oauth url directly in a popup
+        const authWindow = window.open(
+          data.url,
+          'oauth_popup',
+          'width=600,height=700'
+        );
+        if (!authWindow) {
+          setErrorMsg('Please allow popups for this site to log in with Google!');
+        }
+      } else {
+        setErrorMsg('Auth URL generation succeeded but returned empty address.');
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Google Auth initiation failed.');

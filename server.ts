@@ -221,6 +221,56 @@ if (process.env.GEMINI_API_KEY) {
 }
 
 // REST APIs
+app.get(['/auth/callback', '/auth/callback/'], (req: Request, res: Response) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Gaffer Verified</title>
+        <style>
+          body {
+            background-color: #07060b;
+            color: #10b981;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+          }
+          .card {
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 24px;
+            border-radius: 16px;
+            background-color: #12111c;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <h3>⚡ GAFFER TELEMETRY VERIFIED</h3>
+          <p>Syncing multi-portal coordinates...</p>
+        </div>
+        <script>
+          if (window.opener) {
+            window.opener.postMessage({
+              type: 'OAUTH_AUTH_SUCCESS',
+              hash: window.location.hash,
+              search: window.location.search
+            }, '*');
+            setTimeout(() => {
+              window.close();
+            }, 600);
+          } else {
+            window.location.href = '/';
+          }
+        </script>
+      </body>
+    </html>
+  `);
+});
+
 // 1. Auth Mock API
 app.post('/api/auth/login', (req: Request, res: Response) => {
   const { email, username } = req.body;
