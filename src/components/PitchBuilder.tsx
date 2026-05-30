@@ -81,6 +81,8 @@ export default function PitchBuilder({
   // Draft Auto-fill Algorithm! Evaluates high synergy and ratings
   const triggerAutoDraft = () => {
     playFutSound('success');
+    const assignedIds: string[] = [];
+
     // For each slot, find a player in our DB who matching position category, is not already on pitch, and has maximum rating
     const draftSlots = slots.map(slot => {
       const posDetails = FORMATIONS[formationName].positions.find(p => p.id === slot.positionId);
@@ -88,6 +90,8 @@ export default function PitchBuilder({
 
       let validCandidates = availablePlayers.filter((p: Player) => {
         // Prevent doubling player id on pitch
+        if (assignedIds.includes(p.id)) return false;
+
         const onPitch = slots.some(s => s.player?.id === p.id);
         if (onPitch) return false;
 
@@ -103,10 +107,8 @@ export default function PitchBuilder({
       validCandidates.sort((a, b) => b.rating - a.rating);
       const picked = validCandidates[0] || null;
       
-      // Temporarily mark so they aren't duplicates
       if (picked) {
-        // Simple trick: mutation is fine for this block
-        (picked as any)._draftAssigned = true;
+        assignedIds.push(picked.id);
       }
 
       return {
@@ -114,9 +116,6 @@ export default function PitchBuilder({
         player: picked,
       };
     });
-
-    // Cleanup temporary variable
-    availablePlayers.forEach(p => delete (p as any)._draftAssigned);
 
     setSlots(draftSlots);
   };
@@ -137,16 +136,15 @@ export default function PitchBuilder({
   };
 
   const assignPlayerToSlot = (player: Player) => {
-    // Check if player already drafted elsewhere, remove from previous slot to swap
-    const cleanSlots = slots.map(s => {
-      if (s.player?.id === player.id) {
-        return { positionId: s.positionId, player: null };
-      }
-      return s;
-    });
+    // Prevent draft if already assigned to a different slot
+    const isAlreadyAssigned = slots.some(s => s.player?.id === player.id && s.positionId !== activeSlotId);
+    if (isAlreadyAssigned) {
+      playFutSound('click');
+      return;
+    }
 
     // Assign to active
-    const newSlots = cleanSlots.map(s => {
+    const newSlots = slots.map(s => {
       if (s.positionId === activeSlotId) {
         return { positionId: s.positionId, player };
       }
@@ -651,18 +649,37 @@ export default function PitchBuilder({
                   </div>
                 ) : (
                   filteredPlayers.map(player => {
-                    const alreadyOnPitch = slots.some(s => s.player?.id === player.id);
+                    const isCurrentSlotPlayer = slots.some(s => s.player?.id === player.id && s.positionId === activeSlotId);
+                    const isDraftedElsewhere = slots.some(s => s.player?.id === player.id && s.positionId !== activeSlotId);
+                    
                     return (
                       <div key={player.id} className="relative group">
                         <HolographicCard
                           player={player}
-                          onClick={() => assignPlayerToSlot(player)}
+                          onClick={() => {
+                            if (isDraftedElsewhere) {
+                              playFutSound('click');
+                              return;
+                            }
+                            assignPlayerToSlot(player);
+                          }}
                         />
-                        {alreadyOnPitch && (
-                          <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center rounded-xl p-3 text-center border border-yellow-400/25 pointer-events-none select-none">
-                            <Check className="w-8 h-8 text-yellow-400 mb-1" />
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider">
-                              On pitch slot
+                        {isCurrentSlotPlayer && (
+                          <div className="absolute inset-0 bg-slate-950/70 flex flex-col items-center justify-center rounded-xl p-3 text-center border border-emerald-500/35 pointer-events-none select-none">
+                            <Check className="w-8 h-8 text-emerald-400 mb-1" />
+                            <span className="text-[10px] font-black text-[#10b981] uppercase tracking-wider">
+                              Assigned Here
+                            </span>
+                          </div>
+                        )}
+                        {isDraftedElsewhere && (
+                          <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center rounded-xl p-3 text-center border border-red-500/30 select-none cursor-not-allowed">
+                            <X className="w-8 h-8 text-red-500 mb-1" />
+                            <span className="text-[10px] font-black text-red-500 uppercase tracking-wider">
+                              Drafted Elsewhere
+                            </span>
+                            <span className="text-[8px] text-gray-500 mt-1 max-w-[90px] leading-tight font-medium">
+                              Already in your active XI
                             </span>
                           </div>
                         )}
