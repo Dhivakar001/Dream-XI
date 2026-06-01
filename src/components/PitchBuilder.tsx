@@ -41,6 +41,9 @@ export default function PitchBuilder({
   const [isSaving, setIsSaving] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
 
+  // Auto-Draft configuration state with multiple tactical flavors
+  const [draftStrategy, setDraftStrategy] = useState<'elite' | 'hybrid' | 'chaotic' | 'retro' | 'current'>('hybrid');
+
   // Aura Level helper
   const getAuraBadge = (score: number) => {
     if (score < 40) return { text: '❄️ COLD RATING', bg: 'bg-cyan-950/40', border: 'border-cyan-500/30', textClass: 'text-cyan-400', rating: 'TRENCH LEVEL' };
@@ -90,22 +93,33 @@ export default function PitchBuilder({
   const teamRating = calculateSquadRating(slots);
   const teamAura = calculateSquadAura(slots);
 
-  // Draft Auto-fill Algorithm! Evaluates high synergy and ratings
+  // Draft Auto-fill Algorithm! Evaluates high synergy, ratings, and custom tactical strategies
   const triggerAutoDraft = () => {
     playFutSound('success');
     const assignedIds: string[] = [];
 
-    // For each slot, find a player in our DB who matching position category, is not already on pitch, and has maximum rating
-    const draftSlots = slots.map(slot => {
+    // Helper to shuffle arrays
+    const shuffle = <T,>(arr: T[]): T[] => {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    };
+
+    // To add high randomness and ensure every single click yields a different squad,
+    // we shuffle the order of slots that get drafted! This alters which positions
+    // get "first dibs" on players, preventing deterministic line-ups.
+    const shuffledSlots = shuffle(slots.map((s, index) => ({ originalIndex: index, slot: s })));
+
+    const draftedSlotMappings = shuffledSlots.map(({ originalIndex, slot }) => {
       const posDetails = FORMATIONS[formationName].positions.find(p => p.id === slot.positionId);
       const category = posDetails?.category;
 
-      let validCandidates = availablePlayers.filter((p: Player) => {
+      const validCandidates = availablePlayers.filter((p: Player) => {
         // Prevent doubling player id on pitch
         if (assignedIds.includes(p.id)) return false;
-
-        const onPitch = slots.some(s => s.player?.id === p.id);
-        if (onPitch) return false;
 
         // Group matcher
         if (category === 'GK') return p.position === 'GK';
@@ -115,21 +129,67 @@ export default function PitchBuilder({
         return false;
       });
 
-      // Sort by rating desc
-      validCandidates.sort((a, b) => b.rating - a.rating);
-      const picked = validCandidates[0] || null;
-      
+      let picked: Player | null = null;
+
+      if (validCandidates.length > 0) {
+        if (draftStrategy === 'retro') {
+          // Keep vintage legends
+          const retroCandidates = validCandidates.filter(p => p.era === 'Legend');
+          const pool = retroCandidates.length > 0 ? retroCandidates : validCandidates;
+          pool.sort((a, b) => b.rating - a.rating);
+          // Pick randomly from top 3 for extreme variety
+          const topPool = pool.slice(0, 3);
+          const shuffledPool = shuffle(topPool);
+          picked = shuffledPool[0] || null;
+        } else if (draftStrategy === 'current') {
+          // Keep present-day superstars
+          const currentCandidates = validCandidates.filter(p => p.era === 'Current');
+          const pool = currentCandidates.length > 0 ? currentCandidates : validCandidates;
+          pool.sort((a, b) => b.rating - a.rating);
+          // Pick randomly from top 3
+          const topPool = pool.slice(0, 3);
+          const shuffledPool = shuffle(topPool);
+          picked = shuffledPool[0] || null;
+        } else if (draftStrategy === 'chaotic') {
+          // Pure street wild-card: random from any valid position candidate
+          const shuffledPool = shuffle(validCandidates);
+          picked = shuffledPool[0] || null;
+        } else if (draftStrategy === 'hybrid') {
+          // High synergy & variety: pick randomly from top 4 candidates for each slot
+          validCandidates.sort((a, b) => b.rating - a.rating);
+          const topPool = validCandidates.slice(0, 4);
+          const shuffledPool = shuffle(topPool);
+          picked = shuffledPool[0] || null;
+        } else {
+          // 'elite' (Meta Squad list)
+          // Sort strictly by rating desc. To add slight variation, select randomly from top 2.
+          validCandidates.sort((a, b) => b.rating - a.rating);
+          const topPool = validCandidates.slice(0, 2);
+          const shuffledPool = shuffle(topPool);
+          picked = shuffledPool[0] || null;
+        }
+      }
+
       if (picked) {
         assignedIds.push(picked.id);
       }
 
       return {
-        positionId: slot.positionId,
-        player: picked,
+        originalIndex,
+        slot: {
+          positionId: slot.positionId,
+          player: picked,
+        }
       };
     });
 
-    setSlots(draftSlots);
+    // Reconstruct fields to original indices
+    const newSlots = [...slots];
+    draftedSlotMappings.forEach(({ originalIndex, slot }) => {
+      newSlots[originalIndex] = slot;
+    });
+
+    setSlots(newSlots);
   };
 
   const clearPitch = () => {
@@ -369,11 +429,30 @@ export default function PitchBuilder({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] text-[#FBE116] font-mono font-black tracking-wider uppercase select-none">STYLE:</span>
+              <select
+                value={draftStrategy}
+                onChange={(e) => {
+                  playFutSound('click');
+                  setDraftStrategy(e.target.value as any);
+                }}
+                className="bg-black/95 border border-white/15 text-white text-[10px] px-2 py-1.5 rounded-lg font-mono font-bold focus:outline-none focus:border-emerald-400 cursor-pointer text-center"
+                title="Choose Auto-Draft generation flavor"
+              >
+                <option value="elite">🏆 ELITE META</option>
+                <option value="hybrid">🔥 GLOBAL HYBRID</option>
+                <option value="chaotic">🎭 STREET WILD</option>
+                <option value="retro">⏳ VINTAGE ICONS</option>
+                <option value="current">⚡ NEXT-GEN STARS</option>
+              </select>
+            </div>
+
             <button
               onClick={triggerAutoDraft}
               className="flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-green-400 text-black px-3.5 py-1.5 rounded-lg text-xs font-black shadow-[0_0_12px_rgba(16,185,129,0.3)] hover:opacity-90 transition"
-              title="Draft high chemistry elite squad automatically!"
+              title="Draft squad automatically using selected style!"
             >
               <Users className="w-3.5 h-3.5" />
               AUTO-DRAFT
@@ -394,9 +473,9 @@ export default function PitchBuilder({
           {/* Street Yard Pavement Decal lines */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(251,225,22,0.015)_2px,transparent_2px),linear-gradient(90deg,rgba(0,158,73,0.015)_2px,transparent_2px)] bg-[size:32px_32px] pointer-events-none opacity-30" />
 
-          {/* Nike Brazil Joga Bonito Center Backdrop sticker stamp */}
+          {/* Classic Modern Center Backdrop sticker stamp */}
           <div className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-graffiti text-[#FBE116]/8 select-none pointer-events-none text-2xl sm:text-5xl uppercase rotate-[-8deg] tracking-[0.2em] select-none">
-            🇧🇷 RIO DE JANEIRO • JOGA RUA
+            🏆 WORLD ARENA • STREET XI
           </div>
 
           {/* Cyber Stadium Spotlight Beams */}

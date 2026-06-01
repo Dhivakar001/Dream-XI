@@ -1,7 +1,56 @@
 import { motion } from 'motion/react';
-import { Sparkles, Star } from 'lucide-react';
+import { Sparkles, Star, Trophy, Shield, Zap, TrendingUp, Award, Flame, Globe } from 'lucide-react';
 import { Player } from '../types';
 import { playFutSound } from '../utils';
+
+const getCountryAbbrev = (nation: string) => {
+  if (!nation) return 'INT';
+  const mapping: { [key: string]: string } = {
+    'Argentina': 'ARG',
+    'Portugal': 'POR',
+    'Brazil': 'BRA',
+    'France': 'FRA',
+    'Norway': 'NOR',
+    'Egypt': 'EGY',
+    'Sweden': 'SWE',
+    'England': 'ENG',
+    'Netherlands': 'NED',
+    'Belgium': 'BEL',
+    'Italy': 'ITA',
+    'Spain': 'ESP',
+    'Croatia': 'CRO',
+    'Germany': 'GER',
+    'Canada': 'CAN',
+    'Morocco': 'MAR',
+    'Russia': 'RUS'
+  };
+  return mapping[nation] || nation.substring(0, 3).toUpperCase();
+};
+
+const getClubAbbrev = (club: string) => {
+  if (!club) return 'FC';
+  const mapping: { [key: string]: string } = {
+    'Inter Miami': 'MIA',
+    'Al Nassr': 'NAS',
+    'Barcelona': 'BAR',
+    'Real Madrid': 'RMA',
+    'Man City': 'MCI',
+    'Bayern': 'FCB',
+    'Liverpool': 'LIV',
+    'Arsenal': 'ARS',
+    'PSG': 'PSG',
+    'AC Milan': 'ACM',
+    'Juventus': 'JUV',
+    'Chelsea': 'CHE',
+    'Tottenham': 'TOT',
+    'Man United': 'MUN',
+    'Inter': 'INT',
+    'Napoli': 'NAP',
+    'Dortmund': 'BVB',
+    'Atletico': 'ATM'
+  };
+  return mapping[club] || club.substring(0, 3).toUpperCase();
+};
 
 interface HolographicCardProps {
   player: Player;
@@ -26,7 +75,8 @@ export default function HolographicCard({
         badge: 'border-[#ff00a0] text-[#FBE116] bg-[#1a0033] shadow-[0_0_12px_rgba(255,0,160,0.6)]',
         glow: 'shadow-[0_0_30px_rgba(255,0,160,0.7)]',
         banner: 'bg-gradient-to-r from-[#ff00a0] via-[#FBE116] to-[#009E49] text-black font-extrabold',
-        label: '🐐 DEUS DO BOLA',
+        label: 'FOOTBALL GOAT',
+        badgeType: 'goat'
       };
     }
 
@@ -39,7 +89,8 @@ export default function HolographicCard({
           badge: 'border-[#FBE116] text-[#FBE116] bg-[#004221] shadow-[0_0_10px_rgba(251,225,22,0.4)]',
           glow: 'shadow-[0_0_22px_rgba(0,158,73,0.7)]',
           banner: 'bg-gradient-to-r from-[#FBE116] to-[#009E49] text-black font-black',
-          label: '🇧🇷 JOGA MONSTRO',
+          label: 'TOTY SENSATION',
+          badgeType: 'toty'
         };
       case 'Legend':
         return {
@@ -49,7 +100,8 @@ export default function HolographicCard({
           badge: 'border-[#FBE116] text-[#FBE116] bg-[#1a1100]',
           glow: 'shadow-[0_0_20px_rgba(251,225,22,0.6)]',
           banner: 'bg-[#FBE116] text-black font-black',
-          label: '👑 REI GAÚCHO',
+          label: 'IMMORTAL ICON',
+          badgeType: 'legend'
         };
       case 'Icon':
         return {
@@ -59,7 +111,8 @@ export default function HolographicCard({
           badge: 'border-[#009E49] text-white bg-[#02182b]',
           glow: 'shadow-[0_0_15px_rgba(0,158,73,0.5)]',
           banner: 'bg-[#009E49] text-white font-bold',
-          label: '⚡ CO MANDANTE',
+          label: 'PITCH MASTER',
+          badgeType: 'icon'
         };
       case 'Future Star':
         return {
@@ -69,9 +122,10 @@ export default function HolographicCard({
           badge: 'border-[#ec4899] text-[#00efff] bg-[#1e002d]',
           glow: 'shadow-[0_0_24px_rgba(236,72,153,0.6)]',
           banner: 'bg-gradient-to-r from-[#ec4899] to-[#00efff] text-black font-black',
-          label: '🚀 FUTURO BRUTO',
+          label: 'FUTURE TALENT',
+          badgeType: 'future'
         };
-      default: // Gold (now designed as Joga Bonito Star)
+      default: // Gold (now designed as Elite Star)
         return {
           bg: 'bg-gradient-to-b from-[#141208] via-[#2d2911] to-[#090803] border-[#009E49]',
           text: 'text-slate-100',
@@ -79,7 +133,8 @@ export default function HolographicCard({
           badge: 'border-[#009E49] text-[#FBE116] bg-[#0d140e]',
           glow: 'shadow-[0_0_12px_rgba(0,158,73,0.3)]',
           banner: 'bg-[#009E49] text-black font-bold',
-          label: '⚽ BOLA-CHEMA',
+          label: 'ELITE STAR',
+          badgeType: 'gold'
         };
     }
   };
@@ -175,28 +230,40 @@ export default function HolographicCard({
 
       {/* Header Slot: Position & Nation details */}
       <div className="w-full flex justify-between items-start mb-1 select-none z-10">
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-stretch text-center gap-1">
           <span className={`tracking-tighter ${card.ratingText} leading-none select-none ${ratingSizes[size]}`}>
             {player.rating}
           </span>
-          <span className="font-extrabold text-[10px] uppercase text-[#FBE116] select-none tracking-widest mt-0.5">
+          <span className="font-extrabold text-[9px] uppercase text-[#FBE116] select-none tracking-widest leading-none">
             {player.position}
           </span>
-          <span className={`${nationSizes[size]} select-none flex items-center gap-0.5`} title={`${player.nation} Flag`}>
-            {player.nationFlag}
-          </span>
-          <span className={`${clubLogoSizes[size]} select-none drop-shadow-[0_1px_2px_#000]`} title={`${player.club} Badge`}>
-            {player.clubLogo}
-          </span>
+          
+          {/* Nation Abbrev Capsule Tag */}
+          <div className="flex items-center justify-center gap-0.5 bg-black/85 border border-white/20 text-[#FBE116] text-[7.5px] font-mono font-black rounded px-1.5 py-0.5 mt-1 tracking-wider leading-none shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
+            <Globe className="w-2 h-2 text-sky-400 animate-spin-slow shrink-0" />
+            <span>{getCountryAbbrev(player.nation)}</span>
+          </div>
+
+          {/* Club Initial Label Tag */}
+          <div className="flex items-center justify-center gap-0.5 bg-[#0B0B0F] border border-[#009E49]/55 text-white text-[7px] font-sans font-black rounded-md px-1 py-0.5 leading-none shadow-[0_1.5px_3px_rgba(0,0,0,0.6)]">
+            <Shield className="w-1.5 h-1.5 text-emerald-500 shrink-0" />
+            <span>{getClubAbbrev(player.club)}</span>
+          </div>
         </div>
         
         {/* Playstyle Tag / Street Stamp Badge */}
-        <div className={`border-2 rounded-lg uppercase tracking-tighter font-extrabold font-mono select-none ${card.badge} ${badgeSizes[size]}`}>
-          {card.label}
+        <div className={`border-2 rounded-lg uppercase tracking-tighter font-extrabold font-mono select-none flex items-center gap-1 ${card.badge} ${badgeSizes[size]}`}>
+          {card.badgeType === 'goat' && <Award className="w-2.5 h-2.5 text-[#FBE116] animate-pulse" />}
+          {card.badgeType === 'toty' && <Flame className="w-2.5 h-2.5 text-orange-400 animate-bounce" />}
+          {card.badgeType === 'legend' && <Trophy className="w-2.5 h-2.5 text-yellow-500 animate-bounce" />}
+          {card.badgeType === 'icon' && <Zap className="w-2.5 h-2.5 text-cyan-400 animate-pulse" />}
+          {card.badgeType === 'future' && <TrendingUp className="w-2.5 h-2.5 text-pink-500 animate-bounce" />}
+          {card.badgeType === 'gold' && <Shield className="w-2.5 h-2.5 text-emerald-400" />}
+          <span>{card.label}</span>
         </div>
       </div>
 
-      {/* Player Avatar with Stadium Crowd and Brazil Flag background glow */}
+      {/* Player Avatar with Stadium Crowd and Glowing Arena background glow */}
       <div className={`relative ${avatarSizes[size]} flex items-center justify-center bg-black/60 border border-white/10 select-none overflow-hidden z-10`}>
         {/* Colorful street aura flash behind cutout */}
         <div className="absolute inset-0 bg-gradient-to-tr from-[#009E49]/30 to-[#FBE116]/30 animate-pulse opacity-40 blur-sm" />
@@ -270,7 +337,7 @@ export default function HolographicCard({
       <div className="w-full mt-auto select-none z-10">
         <div className="flex justify-between items-center text-[9px] text-[#009E49] font-mono mb-1 select-none">
           <span className="flex items-center gap-1 font-black tracking-wide">
-            ⚡ JOGA AURA index:
+            ⚡ AURA INDEX:
           </span>
           <span className="font-extrabold text-[#FBE116] tracking-widest text-right select-none">
             {player.auraRating}%

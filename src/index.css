@@ -52,7 +52,7 @@
   100% { transform: scale(1) rotate(-8deg); opacity: 1; }
 }
 
-/* Custom classes for the Brazilian Street Football meets Nike Joga Bonito Look */
+/* Custom classes for the Street Football and Arena Style */
 .animate-float {
   animation: float 4s ease-in-out infinite;
 }
@@ -125,7 +125,7 @@
   font-size: 0.7rem;
 }
 
-/* Nike Joga Bonito Black/White stripe hazard pattern */
+/* Classic Hazard Stripe pattern */
 .hazard-border {
   background: repeating-linear-gradient(
     -45deg,
@@ -173,7 +173,7 @@
   border: 2px solid #000000;
 }
 
-/* Custom scrollbar matching Brazil & street football style */
+/* Custom scrollbar matching street football style */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;

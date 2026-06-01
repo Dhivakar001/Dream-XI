@@ -16,34 +16,41 @@ import {
   MessageCircle,
   TrendingUp,
   Share2,
-  ShieldAlert
+  ShieldAlert,
+  Home,
+  Database,
+  Search,
+  Award,
+  Users,
+  Globe
 } from 'lucide-react';
 
 import { Player, Squad, Battle, SocialPost, UserProfile } from './types';
 import { playFutSound } from './utils';
 
-// Import Auth hooks & Subpages
+// Import Auth hooks
 import { useAuth } from './hooks/useAuth';
-import LoginPage from './app/login/page';
-import SignupPage from './app/signup/page';
 import { loadSquadsFromCloud } from './lib/supabaseDb';
 import { supabase } from './lib/supabase';
 
-// Import Modular Components
-import PitchBuilder from './components/PitchBuilder';
-import AIAnalysis from './components/AIAnalysis';
-import MatchSimulator from './components/MatchSimulator';
-import BattleArena from './components/BattleArena';
-import SocialFeed from './components/SocialFeed';
-import LegendsDatabase from './components/LegendsDatabase';
-import UserProfileView from './components/UserProfileView';
-import LeaderboardsView from './components/LeaderboardsView';
+// Import Pages
+import HomePage from './pages/HomePage';
+import TacticalPitchPage from './pages/TacticalPitchPage';
+import TrenchFeedPage from './pages/TrenchFeedPage';
+import LiveDebatesPage from './pages/LiveDebatesPage';
+import MatchSimsPage from './pages/MatchSimsPage';
+import StarDBPage from './pages/StarDBPage';
+import RankingsPage from './pages/RankingsPage';
+import GafferProfilePage from './pages/GafferProfilePage';
+import SettingsPage from './pages/SettingsPage';
+import MySquadsPage from './pages/MySquadsPage';
+
+// Import Shared Modular Components
 import HolographicCard from './components/HolographicCard';
 import UserDropdown from './components/UserDropdown';
 import ProtectedRoute from './components/ProtectedRoute';
-import MySquadsView from './components/MySquadsView';
 
-type TabName = 'builder' | 'simulator' | 'arena' | 'feed' | 'database' | 'profile' | 'leaderboards' | 'my-squads' | 'settings';
+type TabName = 'home' | 'builder' | 'simulator' | 'arena' | 'feed' | 'database' | 'profile' | 'leaderboards' | 'my-squads' | 'settings';
 
 // Demo top stars for the floating hero showcase
 const HERO_SHOWCASE_PLAYERS: Player[] = [
@@ -107,7 +114,24 @@ export default function App() {
   const { user, profile: authProfile, loading: authLoading, setProfile: setAuthProfile } = useAuth();
   const [authScreen, setAuthScreen] = useState<'login' | 'signup'>('login');
 
-  const [activeTab, setActiveTab] = useState<TabName>('builder');
+  const [activeTab, setActiveTab] = useState<TabName>(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash.replace('#', '') : '';
+    const validTabs: TabName[] = ['home', 'builder', 'simulator', 'arena', 'feed', 'database', 'profile', 'leaderboards', 'my-squads', 'settings'];
+    return validTabs.includes(hash as TabName) ? (hash as TabName) : 'home';
+  });
+
+  // Sync hash changes to the current view page
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      const validTabs: TabName[] = ['home', 'builder', 'simulator', 'arena', 'feed', 'database', 'profile', 'leaderboards', 'my-squads', 'settings'];
+      if (validTabs.includes(hash as TabName)) {
+        setActiveTab(hash as TabName);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   // Core telemetry States
   const [loading, setLoading] = useState(true);
@@ -327,13 +351,15 @@ export default function App() {
   const handleAnalyzeSquadTrigger = (squad: Squad) => {
     setSquadForAnalysis(squad);
     setActiveTab('builder'); // Ensure viewer focuses on builder context with analysis pane
+    window.location.hash = 'builder';
   };
 
   const handleTabChange = (tab: TabName) => {
     playFutSound('click');
     setActiveTab(tab);
-    // Smooth scroll to top of pitch/tabs area
-    window.scrollTo({ top: 320, behavior: 'smooth' });
+    window.location.hash = tab;
+    // Smooth scroll to top of the page for true page feeling
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (authLoading) {
@@ -421,27 +447,35 @@ export default function App() {
       {/* Spraypaint paint splash overlays */}
       <div className="spray-overlay" />
 
-      {/* Floating Retro Brazil Sports Stickers Collectibles */}
-      <div className="absolute top-[180px] left-[2%] z-50 pointer-events-none hidden xl:block animate-float">
-        <div className="street-sticker-brazil">
-          🇧🇷 JOGA BONITO
-        </div>
-      </div>
-      <div className="absolute top-[480px] right-[2%] z-50 pointer-events-none hidden xl:block animate-float-slow">
-        <div className="street-sticker">
-          🔥 +99 AURA index
-        </div>
-      </div>
-      <div className="absolute top-[820px] left-[1.5%] z-50 pointer-events-none hidden xl:block animate-float-fast">
-        <div className="street-sticker-brazil rotate-[-8deg] shadow-emerald-500/30 shadow-lg">
-          ⚽ COPA DE RUA
-        </div>
-      </div>
-      <div className="absolute top-[340px] left-[84%] z-50 pointer-events-none hidden xl:block animate-float">
-        <div className="street-sticker rotate-[15deg]">
-          💯 HE COOKED
-        </div>
-      </div>
+      {/* Floating Retro Sports Stickers Collectibles (Exclusive to the Homepage) */}
+      {activeTab === 'home' && (
+        <>
+          <div className="absolute top-[180px] left-[2%] z-50 pointer-events-none hidden xl:block animate-float">
+            <div className="street-sticker-brazil flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-black">
+              <Globe className="w-3.5 h-3.5 text-yellow-300 animate-spin-slow" />
+              <span>TOTAL FOOTBALL</span>
+            </div>
+          </div>
+          <div className="absolute top-[480px] right-[2%] z-50 pointer-events-none hidden xl:block animate-float-slow">
+            <div className="street-sticker flex items-center gap-1.5 px-3 py-1.5 rounded-lg">
+              <Flame className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
+              <span>+99 AURA INDEX</span>
+            </div>
+          </div>
+          <div className="absolute top-[820px] left-[1.5%] z-50 pointer-events-none hidden xl:block animate-float-fast">
+            <div className="street-sticker-brazil rotate-[-8deg] shadow-emerald-500/30 shadow-lg flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-black">
+              <Trophy className="w-3.5 h-3.5 text-[#FBE116] animate-bounce" />
+              <span>CHAMPIONS CUP</span>
+            </div>
+          </div>
+          <div className="absolute top-[340px] left-[84%] z-50 pointer-events-none hidden xl:block animate-float">
+            <div className="street-sticker rotate-[15deg] flex items-center gap-1.5 px-3 py-1.5 rounded-lg">
+              <Award className="w-3.5 h-3.5 text-yellow-500 animate-pulse" />
+              <span>HE COOKED</span>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Heavy colorful glowing neon ambient backdrops */}
       <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#FBE116]/10 blur-[130px] rounded-full pointer-events-none select-none" />
@@ -453,16 +487,16 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between flex-wrap gap-4">
           
           {/* Logo Brand Title */}
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => handleTabChange('builder')}>
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => handleTabChange('home')}>
             <span className="bg-[#FBE116] p-2.5 rounded-2xl text-black border-2 border-black shadow-[4px_4px_0px_#009E49] group-hover:scale-115 group-hover:rotate-6 transition-all duration-300">
               <Trophy className="w-5 h-5 text-black fill-black" />
             </span>
             <div className="leading-none">
               <h2 className="text-xl font-black tracking-tighter text-white flex items-center gap-1 font-outfit uppercase italic">
-                DREAM XI <span className="text-[10px] text-white font-mono font-black tracking-widest bg-[#009E49] px-2 py-0.5 rounded leading-none border border-black">JOGA LABS</span>
+                DREAM XI <span className="text-[10px] text-white font-mono font-black tracking-widest bg-[#009E49] px-2 py-0.5 rounded leading-none border border-black">ARENA LABS</span>
               </h2>
               <p className="text-[9px] text-[#FBE116] font-mono tracking-wider font-black uppercase mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#009E49] animate-pulse" /> RIO DE JANEIRO STREETS
+                <span className="w-1.5 h-1.5 rounded-full bg-[#009E49] animate-pulse" /> GLOBAL STREET ARENAS
               </p>
             </div>
           </div>
@@ -471,13 +505,13 @@ export default function App() {
           <div className="hidden md:flex items-center gap-5 font-mono text-[10px] text-gray-300 uppercase leading-none bg-[#0B0B0F] border-2 border-black street-shadow-yellow px-4 py-2.5 rounded-2xl">
             <span className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#FBE116] animate-spin" />
-              STATUS: <strong className="text-white bg-[#009E49] text-white px-1.5 py-0.5 rounded text-[8px] tracking-tighter">🇧🇷 JOGA BONITO</strong>
+              STATUS: <strong className="text-white bg-[#009E49] px-1.5 py-1 rounded text-[8px] tracking-tighter flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#FBE116] animate-ping" />ACTIVE GAFFER</strong>
             </span>
             <span className="flex items-center gap-1.5 border-l border-white/10 pl-5">
-              👑 STREAK: <strong className="text-[#FBE116]">Level 4</strong>
+              <Award className="w-3.5 h-3.5 text-[#FBE116] animate-pulse" /> STREAK: <strong className="text-[#FBE116]">Level 4</strong>
             </span>
             <span className="flex items-center gap-1.5 border-l border-white/10 pl-5">
-              🔥 DEBATES: <strong className="text-pink-400">{battles.length} active</strong>
+              <Flame className="w-3.5 h-3.5 text-pink-400 animate-pulse" /> DEBATES: <strong className="text-pink-400">{battles.length} active</strong>
             </span>
           </div>
 
@@ -524,92 +558,21 @@ export default function App() {
         </div>
       </header>
 
-      {/* 2. TikTok Meets FIFA Spectacular Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-16 px-4 border-b-2 border-black bg-gradient-to-b from-[#009E49]/5 via-black/40 to-[#050408]/80 select-none">
-        
-        {/* Dynamic diagonal stripe texture */}
-        <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,rgba(0,158,73,0.015),rgba(0,158,73,0.015)_20px,transparent_20px,transparent_40px)] pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          
-          {/* Hero Left Content Column */}
-          <div className="lg:col-span-7 flex flex-col justify-center leading-none text-left select-none relative z-10">
-            <div className="inline-flex items-center gap-2 bg-[#009E49]/20 border-2 border-[#009E49] px-3.5 py-1.5 rounded-xl text-[10px] font-mono font-black text-[#FBE116] uppercase tracking-widest mb-6 w-fit animate-pulse rotate-[-1.5deg]">
-              <Flame className="w-4 h-4 text-[#FBE116]" /> 🇧🇷 Copacabana Street Certified
-            </div>
-            
-            <h1 className="text-4xl sm:text-7xl font-black text-white tracking-tighter leading-none uppercase mb-6 drop-shadow-md font-outfit italic">
-              DRAFT THE XI <br /> 
-              <span className="bg-gradient-to-r from-[#FBE116] via-[#009E49] to-[#00efff] bg-clip-text text-transparent italic">
-                EVERYONE WILL ARGUE ABOUT.
-              </span>
-            </h1>
-
-            <p className="text-slate-300 text-sm sm:text-base font-medium font-sans leading-relaxed tracking-tight max-w-xl mb-8">
-              Create your Dream XI lineups with raw asphalt tactics. Pitch your team in live match simulations, grab unfiltered expert AI gaffer takes, trigger interactive social feed debates, and prove your sovereign coach Aura Score.
-            </p>
-
-            {/* Micro Engagement Stats Grid - Panini Sticker vibe boxes */}
-            <div className="grid grid-cols-3 gap-4 max-w-lg mb-8">
-              <div className="bg-black/80 border-2 border-black street-shadow-yellow p-4 rounded-xl relative overflow-hidden backdrop-blur">
-                <div className="text-2xl sm:text-3xl font-black text-[#FBE116] font-graffiti">99+</div>
-                <div className="text-[9px] text-[#009E49] uppercase font-mono mt-1 font-black">Aura Cap</div>
-              </div>
-              <div className="bg-black/80 border-2 border-black street-shadow-green p-4 rounded-xl relative overflow-hidden backdrop-blur">
-                <div className="text-2xl sm:text-3xl font-black text-[#009E49] font-graffiti">100%</div>
-                <div className="text-[9px] text-gray-400 uppercase font-mono mt-1 font-black">Raw Debates</div>
-              </div>
-              <div className="bg-black/80 border-2 border-black street-shadow-blue p-4 rounded-xl relative overflow-hidden backdrop-blur">
-                <div className="text-2xl sm:text-3xl font-black text-sky-400 font-graffiti">Live</div>
-                <div className="text-[9px] text-[#FBE116] uppercase font-mono mt-1 font-black">Joga Vibe</div>
-              </div>
-            </div>
-
-            {/* Quick Action CTA Button */}
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={() => handleTabChange('builder')}
-                className="px-6 py-4 bg-gradient-to-r from-[#FBE116] to-[#009E49] text-black border-2 border-black font-black uppercase text-xs tracking-wider rounded-xl hover:scale-105 active:scale-95 transition shadow-[4px_4px_0px_#000] cursor-pointer"
-              >
-                🔥 DRAFT MY SQUAD
-              </button>
-              <button
-                onClick={() => handleTabChange('feed')}
-                className="px-6 py-4 bg-white/5 hover:bg-white/10 border-2 border-black text-white font-black uppercase text-xs tracking-wider rounded-xl transition cursor-pointer"
-              >
-                📢 VIEW TRENCH TAKES
-              </button>
-            </div>
-          </div>
-
-          {/* Hero Right Column: Spectacular Floating Collectible Cards */}
-          <div className="lg:col-span-5 relative h-[380px] flex items-center justify-center select-none mt-6 lg:mt-0">
-            {/* Live stadium vibe circular backing */}
-            <div className="absolute w-[320px] h-[320px] rounded-full bg-gradient-to-tr from-[#009E49]/20 to-[#FBE116]/20 blur-3xl animate-spin-slow pointer-events-none" />
-
-            {/* Card 1 Floating left */}
-            <div className="absolute left-2 top-4 select-none transform -rotate-12 hover:rotate-2 hover:scale-105 hover:z-30 transition-all duration-300 animate-float-slow origin-bottom-left">
-              <HolographicCard player={HERO_SHOWCASE_PLAYERS[2]} size="sm" showStats={false} />
-            </div>
-
-            {/* Card 2 Floating center foreground */}
-            <div className="absolute z-20 top-8 select-none scale-105 hover:scale-110 hover:-rotate-2 transition-all duration-300 animate-float origin-center shadow-[0_20px_45px_rgba(0,0,0,0.9)]">
-              <HolographicCard player={HERO_SHOWCASE_PLAYERS[0]} size="md" showStats={true} />
-            </div>
-
-            {/* Card 3 Floating right */}
-            <div className="absolute right-2 top-10 select-none transform rotate-12 hover:rotate-[-2deg] hover:scale-105 hover:z-30 transition-all duration-300 animate-float-fast origin-bottom-right">
-              <HolographicCard player={HERO_SHOWCASE_PLAYERS[1]} size="sm" showStats={false} />
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* 3. Segmented Navigation Bar - Joga Bonito Slab Buttons */}
+      {/* 3. Segmented Navigation Bar - Slab Buttons */}
       <nav id="navigation-root" className="border-b-[3px] border-black bg-[#050408]/90 py-4 select-none sticky top-[66px] z-20 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 flex gap-3 overflow-x-auto font-mono text-xs whitespace-nowrap scrollbar-none items-center justify-start sm:justify-center">
           
+          <button
+            onClick={() => handleTabChange('home')}
+            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
+              activeTab === 'home'
+                ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-[4px_4px_0px_#FBE116] rotate-[1.5deg]'
+                : 'bg-black/60 text-gray-300 hover:text-emerald-400 hover:bg-black'
+            }`}
+          >
+            <Home className="w-4 h-4 text-current" /> Home Hub
+          </button>
+
           <button
             onClick={() => handleTabChange('builder')}
             className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
@@ -618,7 +581,7 @@ export default function App() {
                 : 'bg-black/60 text-gray-300 hover:text-[#FBE116] hover:bg-black'
             }`}
           >
-            📋 Tactical Pitch
+            <Compass className="w-4 h-4 text-current animate-spin-slow" style={{ animationDuration: '8s' }} /> Tactical Pitch
           </button>
 
           <button
@@ -629,7 +592,7 @@ export default function App() {
                 : 'bg-black/60 text-gray-300 hover:text-[#009E49] hover:bg-black'
             }`}
           >
-            📢 Trench Feed
+            <MessageCircle className="w-4 h-4 text-current animate-pulse" /> Trench Feed
           </button>
 
           <button
@@ -640,7 +603,7 @@ export default function App() {
                 : 'bg-black/60 text-gray-300 hover:text-[#002776] hover:bg-black'
             }`}
           >
-            ⚔️ Live Debates
+            <Swords className="w-4 h-4 text-current animate-bounce" /> Live Debates
           </button>
 
           <button
@@ -651,7 +614,7 @@ export default function App() {
                 : 'bg-black/60 text-gray-300 hover:text-cyan-400 hover:bg-black'
             }`}
           >
-            🤖 Match Sims
+            <Cpu className="w-4 h-4 text-current animate-pulse" /> Match Sims
           </button>
 
           <button
@@ -662,7 +625,7 @@ export default function App() {
                 : 'bg-black/60 text-gray-300 hover:text-yellow-400 hover:bg-black'
             }`}
           >
-            🔍 Star DB
+            <Database className="w-4 h-4 text-current" /> Star DB
           </button>
 
           <button
@@ -673,7 +636,7 @@ export default function App() {
                 : 'bg-black/60 text-gray-300 hover:text-orange-400 hover:bg-black'
             }`}
           >
-            🏆 Rankings
+            <Trophy className="w-4 h-4 text-current" /> Rankings
           </button>
 
           <button
@@ -684,7 +647,7 @@ export default function App() {
                 : 'bg-black/60 text-gray-300 hover:text-emerald-400 hover:bg-black'
             }`}
           >
-            👤 Joga Profile
+            <User className="w-4 h-4 text-current" /> Gaffer Profile
           </button>
 
         </div>
@@ -700,38 +663,41 @@ export default function App() {
             exit={{ opacity: 0, scale: 0.98, y: -15 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
+            {activeTab === 'home' && (
+              <HomePage
+                onNavigate={(tab) => handleTabChange(tab)}
+                battlesCount={battles.length}
+              />
+            )}
+
             {activeTab === 'builder' && (
               <ProtectedRoute user={user} id="protected-builder">
-                <div className="flex flex-col gap-6">
-                  <PitchBuilder
-                    userId={profile?.id || 'u-user'}
-                    userName={profile?.username || 'Gaffer_XI'}
-                    availablePlayers={availablePlayers}
-                    activeSquad={activeSquad}
-                    onSetSquad={handleSetSquadInPitch}
-                    onAnalyzeSquad={handleAnalyzeSquadTrigger}
-                  />
-
-                  {/* Inline visual drawer representing Gemini AI Analysis */}
-                  <AIAnalysis squad={squadForAnalysis} />
-                </div>
+                <TacticalPitchPage
+                  userId={profile?.id || 'u-user'}
+                  userName={profile?.username || 'Gaffer_XI'}
+                  availablePlayers={availablePlayers}
+                  activeSquad={activeSquad}
+                  squadForAnalysis={squadForAnalysis}
+                  onSetSquad={handleSetSquadInPitch}
+                  onAnalyzeSquad={handleAnalyzeSquadTrigger}
+                />
               </ProtectedRoute>
             )}
 
             {activeTab === 'feed' && (
-              <SocialFeed
+              <TrenchFeedPage
                 userId={profile?.id || 'u-user'}
                 userName={profile?.username || 'Gaffer_XI'}
                 userBio={profile?.bio || 'Hype-Lord coach.'}
                 feedPosts={feedPosts}
                 onSetSquad={handleSetSquadInPitch}
                 onRefreshFeed={refreshFeedPosts}
-                onSwitchTab={(t) => setActiveTab(t as TabName)}
+                onSwitchTab={(t) => handleTabChange(t as TabName)}
               />
             )}
 
             {activeTab === 'arena' && (
-              <BattleArena
+              <LiveDebatesPage
                 userId={profile?.id || 'u-user'}
                 userName={profile?.username || 'Gaffer_XI'}
                 battles={battles}
@@ -741,41 +707,38 @@ export default function App() {
             )}
 
             {activeTab === 'simulator' && (
-              <MatchSimulator
+              <MatchSimsPage
                 userSquad={activeSquad || squadsList.find(s => s.userId === profile?.id) || null}
                 savedSquads={squadsList}
               />
             )}
 
             {activeTab === 'database' && (
-              <LegendsDatabase onSetSquad={handleSetSquadInPitch} />
+              <StarDBPage onSetSquad={handleSetSquadInPitch} />
             )}
 
             {activeTab === 'leaderboards' && (
-              <LeaderboardsView squadsList={squadsList} />
+              <RankingsPage squadsList={squadsList} />
             )}
 
             {activeTab === 'profile' && (
               <ProtectedRoute user={user} id="protected-profile">
                 {profile && (
-                  <div key="profile-view" className="w-full">
-                    <UserProfileView
-                      profile={profile}
-                      squadsList={squadsList}
-                      onUpdateProfile={(p) => {
-                        setProfile(p);
-                        setAuthProfile(p);
-                      }}
-                      onLoadSquad={(sq) => {
-                        setActiveSquad(sq);
-                        setActiveTab('builder');
-                        window.scrollTo({ top: 320, behavior: 'smooth' });
-                      }}
-                      onDeleteSquad={() => {
-                        refreshSquadsList();
-                      }}
-                    />
-                  </div>
+                  <GafferProfilePage
+                    profile={profile}
+                    squadsList={squadsList}
+                    onUpdateProfile={(p) => {
+                      setProfile(p);
+                      setAuthProfile(p);
+                    }}
+                    onLoadSquad={(sq) => {
+                      setActiveSquad(sq);
+                      handleTabChange('builder');
+                    }}
+                    onDeleteSquad={() => {
+                      refreshSquadsList();
+                    }}
+                  />
                 )}
               </ProtectedRoute>
             )}
@@ -783,25 +746,21 @@ export default function App() {
             {activeTab === 'settings' && (
               <ProtectedRoute user={user} id="protected-settings">
                 {profile && (
-                  <div key="settings-view" className="w-full">
-                    <UserProfileView
-                      profile={profile}
-                      squadsList={squadsList}
-                      onUpdateProfile={(p) => {
-                        setProfile(p);
-                        setAuthProfile(p);
-                      }}
-                      onLoadSquad={(sq) => {
-                        setActiveSquad(sq);
-                        setActiveTab('builder');
-                        window.scrollTo({ top: 320, behavior: 'smooth' });
-                      }}
-                      onDeleteSquad={() => {
-                        refreshSquadsList();
-                      }}
-                      initialEditing={true}
-                    />
-                  </div>
+                  <SettingsPage
+                    profile={profile}
+                    squadsList={squadsList}
+                    onUpdateProfile={(p) => {
+                      setProfile(p);
+                      setAuthProfile(p);
+                    }}
+                    onLoadSquad={(sq) => {
+                      setActiveSquad(sq);
+                      handleTabChange('builder');
+                    }}
+                    onDeleteSquad={() => {
+                      refreshSquadsList();
+                    }}
+                  />
                 )}
               </ProtectedRoute>
             )}
@@ -809,19 +768,18 @@ export default function App() {
             {activeTab === 'my-squads' && (
               <ProtectedRoute user={user} id="protected-my-squads">
                 {profile && (
-                  <MySquadsView
+                  <MySquadsPage
                     userId={profile.id}
                     squadsList={squadsList}
                     onLoadSquad={(sq) => {
                       setActiveSquad(sq);
-                      setActiveTab('builder');
-                      window.scrollTo({ top: 320, behavior: 'smooth' });
+                      handleTabChange('builder');
                     }}
                     onDeleteSquad={() => {
                       refreshSquadsList();
                     }}
                     onGoToBuilder={() => {
-                      setActiveTab('builder');
+                      handleTabChange('builder');
                     }}
                   />
                 )}
@@ -833,47 +791,47 @@ export default function App() {
       </main>
 
       {/* 5. Mobile Native-inspired Fixed Bottom Bar Navigation for TikTok-like experience */}
-      <div className="sm:hidden fixed bottom-0 inset-x-0 bg-[#0B0B0F]/95 border-t border-white/10 py-2.5 px-4 z-40 flex justify-between items-center backdrop-blur-lg rounded-t-3xl shadow-[0_-10px_25px_rgba(0,0,0,0.5)] font-mono text-[9px]">
+      <div className="sm:hidden fixed bottom-0 inset-x-0 bg-[#0B0B0F]/95 border-t border-white/10 py-2.5 px-3 z-40 flex justify-between items-center backdrop-blur-lg rounded-t-3xl shadow-[0_-10px_25px_rgba(0,0,0,0.5)] font-mono text-[8px]">
         <button
-          onClick={() => { playFutSound('click'); setActiveTab('builder'); }}
+          onClick={() => { playFutSound('click'); handleTabChange('home'); }}
+          className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'home' ? 'text-[#FBE116] font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
+        >
+          <Trophy className="w-4 h-4 text-current" />
+          <span>Hub</span>
+        </button>
+        <button
+          onClick={() => { playFutSound('click'); handleTabChange('builder'); }}
           className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'builder' ? 'text-emerald-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
         >
-          <Compass className="w-5 h-5 text-current" />
+          <Compass className="w-4 h-4 text-current" />
           <span>Pitch</span>
         </button>
         <button
-          onClick={() => { playFutSound('click'); setActiveTab('feed'); }}
+          onClick={() => { playFutSound('click'); handleTabChange('feed'); }}
           className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'feed' ? 'text-purple-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
         >
-          <MessageCircle className="w-5 h-5 text-current" />
+          <MessageCircle className="w-4 h-4 text-current" />
           <span>Trench</span>
         </button>
         <button
-          onClick={() => { playFutSound('click'); setActiveTab('arena'); }}
+          onClick={() => { playFutSound('click'); handleTabChange('arena'); }}
           className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'arena' ? 'text-pink-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
         >
-          <Swords className="w-5 h-5 text-current" />
+          <Swords className="w-4 h-4 text-current" />
           <span>Debates</span>
         </button>
         <button
-          onClick={() => { playFutSound('click'); setActiveTab('simulator'); }}
+          onClick={() => { playFutSound('click'); handleTabChange('simulator'); }}
           className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'simulator' ? 'text-cyan-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
         >
-          <Tv className="w-5 h-5 text-current" />
+          <Tv className="w-4 h-4 text-current" />
           <span>Sims</span>
         </button>
         <button
-          onClick={() => { playFutSound('click'); setActiveTab('database'); }}
-          className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'database' ? 'text-yellow-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
-        >
-          <Sparkles className="w-5 h-5 text-current" />
-          <span>Stars</span>
-        </button>
-        <button
-          onClick={() => { playFutSound('click'); setActiveTab('profile'); }}
+          onClick={() => { playFutSound('click'); handleTabChange('profile'); }}
           className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'profile' ? 'text-orange-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
         >
-          <User className="w-5 h-5 text-current" />
+          <User className="w-4 h-4 text-current" />
           <span>Gaffer</span>
         </button>
       </div>

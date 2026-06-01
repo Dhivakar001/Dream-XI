@@ -52,7 +52,7 @@ export default function ProfileCard({ profile, squads, id }: ProfileCardProps) {
             @{profile.username}
           </h2>
           <span className="text-[10px] font-mono font-black uppercase tracking-wider px-2.5 py-1 rounded bg-[#009E49] text-white border border-black shadow-[2px_2px_0px_#000]">
-            🇧🇷 SELEÇÃO GAFFER
+            🏆 MASTER GAFFER
           </span>
         </div>
 
@@ -65,7 +65,7 @@ export default function ProfileCard({ profile, squads, id }: ProfileCardProps) {
         </p>
 
         <p className="text-sm text-slate-250 font-sans italic mt-4 max-w-md bg-zinc-950 p-3 rounded-xl border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,0.4)] mx-auto md:mx-0 leading-relaxed text-center md:text-left">
-          "{profile.bio || 'New Joga Bonito Dream XI Gaffer!'}"
+          "{profile.bio || 'New Ultimate Dream XI Gaffer!'}"
         </p>
 
         {/* Tactical Badges row */}
