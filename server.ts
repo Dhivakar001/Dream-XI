@@ -1,9 +1,11 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Type } from '@google/genai';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import { PLAYERS_DB } from './src/playersData';
 import { Squad, Battle, Comment, SocialPost, UserProfile } from './src/types';
 
@@ -12,7 +14,62 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+// Security 1: Trust Reserve Proxies (Cloud Run routes through proxy headers)
+app.set('trust proxy', 1);
+
+// Security 2: Helmet Security Headers (Customized to support AI Studio iframe embedding and asset delivery)
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      imgSrc: ["'self'", "data:", "https://*.supabase.co", "https://*.google.com", "https://*.googleusercontent.com", "https://*.githubusercontent.com", "https://api.dicebear.com"],
+      connectSrc: ["'self'", "https://*.supabase.co", "https://*.google.com", "https://*.googleapis.com"],
+      // Allow user iframe viewing correctly in sandbox frames/ports
+      frameAncestors: ["*"],
+    },
+  },
+  // Ensure the applet can open inside internal development portals/previews
+  frameguard: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false,
+}));
+
+// Security 3: Defensive Payload Sizing
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
+
+// Security 4: Rate Limiter Strategies
+const globalLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 300, // Safe limit for normal multi-tab traffic
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please slow down!' }
+});
+
+const aiLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 15, // Protect costly API credits & resource exhaustion
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Tactical analysis speed limit reached. Please wait 60 seconds before recalculating.' }
+});
+
+const authLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 20, // Prevents login bot script spams
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Auth rate limit reached. Please attempt again in 5 minutes.' }
+});
+
+// App level global protection
+app.use('/api/', globalLimiter);
 
 // Persistent JSON Database Configuration
 const DB_DIR = path.join(process.cwd(), 'data');
@@ -272,15 +329,23 @@ app.get(['/auth/callback', '/auth/callback/'], (req: Request, res: Response) => 
 });
 
 // 1. Auth Mock API
-app.post('/api/auth/login', (req: Request, res: Response) => {
+app.post('/api/auth/login', authLimiter, (req: Request, res: Response) => {
   const { email, username } = req.body;
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    res.status(400).json({ error: 'A valid email is required to authenticate.' });
+    return;
+  }
+  
+  const sanitizedEmail = email.slice(0, 150).trim().toLowerCase();
+  const sanitizedUsername = username && typeof username === 'string' ? username.slice(0, 50).replace(/<[^>]*>/g, '').trim() : '';
+
   const db = loadDB();
-  let user = db.users.find((u: any) => u.email === email);
+  let user = db.users.find((u: any) => u.email === sanitizedEmail);
   if (!user) {
     user = {
       id: 'u-' + Math.random().toString(36).substring(2, 9),
-      username: username || email.split('@')[0],
-      email: email,
+      username: sanitizedUsername || sanitizedEmail.split('@')[0],
+      email: sanitizedEmail,
       favoriteClub: 'Real Madrid',
       winRate: 50,
       footballIQ: 100,
@@ -618,12 +683,17 @@ app.get('/api/leaderboards', (req: Request, res: Response) => {
 });
 
 // 8. Gemini API - Smart Squad Analysis Endpoint
-app.post('/api/gemini/analyze', async (req: Request, res: Response) => {
+app.post('/api/gemini/analyze', aiLimiter, async (req: Request, res: Response) => {
   const { squadName, formation, slots, chemistry, rating } = req.body;
+  
+  if (!slots || !Array.isArray(slots)) {
+    res.status(400).json({ error: 'Missing or invalid slots payload array' });
+    return;
+  }
   
   // Prepare dynamic team description to feed Gemini
   const activePlayers = slots
-    .filter((slot: any) => slot.player !== null)
+    .filter((slot: any) => slot && slot.player !== null && slot.player !== undefined)
     .map((slot: any) => `${slot.player.name} (${slot.player.position}, rating: ${slot.player.rating}, club: ${slot.player.club}, nation: ${slot.player.nation}, era: ${slot.player.era})`);
   
   if (activePlayers.length === 0) {
@@ -775,6 +845,16 @@ app.post('/api/gemini/analyze', async (req: Request, res: Response) => {
     console.warn('Gemini API Call failed, fallback used:', err?.message || err);
     res.json(getFallbackAnalysis());
   }
+});
+
+
+// Security 5: Centralized Production-Safe Error Handler (Hides raw details, prevents leaking server configs)
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('[DATABASE/API CORRUPTION PREVENTED]:', err?.stack || err?.message || err);
+  res.status(500).json({
+    success: false,
+    error: 'A secure server-side transaction exception was intercepted. Please retry or contact administration.'
+  });
 });
 
 
