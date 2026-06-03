@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Mail, Lock, Eye, EyeOff, Loader, Sparkles, Flame, Shield, ChevronRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { playFutSound } from '../../utils';
+import { useTranslation } from '../../lib/LanguageContext';
 
 interface LoginFormProps {
   onToggleForm: () => void;
@@ -10,6 +11,7 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -30,18 +32,18 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
     setErrorMsg('');
 
     if (!email) {
-      setEmailError('Email is required, Gaffer!');
+      setEmailError(t('Email is required, Gaffer!'));
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      setEmailError('Input a valid tactical transfer-window email address!');
+      setEmailError(t('Input a valid tactical transfer-window email address!'));
       isValid = false;
     }
 
     if (!password) {
-      setPasswordError('Password is required to lock in your squad!');
+      setPasswordError(t('Password is required to lock in your squad!'));
       isValid = false;
     } else if (password.length < 8) {
-      setPasswordError('Min 8 premium characters required!');
+      setPasswordError(t('Min 8 premium characters required!'));
       isValid = false;
     }
 
@@ -69,14 +71,14 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
         setErrorMsg(error.message);
         playFutSound('click');
       } else {
-        setSuccessMsg("GAFFER CREDENTIALS VERIFIED! Welcome back to the pitch.");
+        setSuccessMsg(t("GAFFER CREDENTIALS VERIFIED! Welcome back to the pitch."));
         playFutSound('success');
         setTimeout(() => {
           onSuccess();
         }, 1200);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Crashed. Review internet coordinates!');
+      setErrorMsg(err.message || t('Crashed. Review internet coordinates!'));
     } finally {
       setLoading(false);
     }
@@ -106,13 +108,13 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
           'width=600,height=700'
         );
         if (!authWindow) {
-          setErrorMsg('Please allow popups for this site to log in with Google!');
+          setErrorMsg(t('Please allow popups for this site to log in with Google!'));
         }
       } else {
-        setErrorMsg('Auth URL generation succeeded but returned empty address.');
+        setErrorMsg(t('Auth URL generation succeeded but returned empty address.'));
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Google Auth initiation failed.');
+      setErrorMsg(err.message || t('Google Auth initiation failed.'));
     } finally {
       setLoading(false);
     }
@@ -120,7 +122,7 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
 
   const handleForgotPassword = async () => {
     if (!email) {
-      setEmailError('Provide your email first to recover tactical keys!');
+      setEmailError(t('Provide your email first to recover tactical keys!'));
       return;
     }
     setLoading(true);
@@ -131,9 +133,9 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
         redirectTo: `${window.location.origin}`,
       });
       if (error) {
-        setErrorMsg(error.message);
+         setErrorMsg(error.message);
       } else {
-        setSuccessMsg('Recovery telemetry coordinates dispatched! Check email.');
+        setSuccessMsg(t('Recovery telemetry coordinates dispatched! Check email.'));
       }
     } catch (err: any) {
       setErrorMsg(err.message);
@@ -163,30 +165,30 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
 
       <div className="text-center mb-6">
         <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center justify-center gap-1.5">
-          Welcome Back <Flame className="w-5 h-5 text-red-500 fill-red-500 animate-bounce" />
+          {t("Welcome Back")} <Flame className="w-5 h-5 text-red-500 fill-red-500 animate-bounce" />
         </h2>
         <p className="text-gray-400 text-xs mt-1.5 font-mono">
-          Build your dream squad and continue your football journey.
+          {t("Build your dream squad and continue your football journey.")}
         </p>
       </div>
 
       {/* Global telemetry alerts */}
       {errorMsg && (
         <div className="bg-red-950/40 border border-red-500/30 text-red-400 text-[10px] p-3 rounded-xl font-mono uppercase tracking-wider mb-4 leading-normal">
-          ⚠️ TACTICAL ERROR: {errorMsg}
+          ⚠️ {t("TACTICAL ERROR")}: {errorMsg}
         </div>
       )}
 
       {successMsg && (
         <div className="bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-[10px] p-3 rounded-xl font-mono uppercase tracking-wider mb-4 leading-normal">
-          ✅ SYSTEM: {successMsg}
+          ✅ {t("SYSTEM")}: {successMsg}
         </div>
       )}
 
       <form onSubmit={handleLogin} className="flex flex-col gap-4">
         {/* Email Form Entry */}
         <div>
-          <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block mb-1.5 pl-1.5">EMAIL ADDR</label>
+          <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block mb-1.5 pl-1.5">{t("EMAIL ADDR")}</label>
           <div className="relative">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
               <Mail className="w-4 h-4" />
@@ -207,13 +209,13 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
         {/* Password Entry */}
         <div>
           <div className="flex justify-between items-center mb-1.5 pl-1.5">
-            <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block">GADGET KEY</label>
+            <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block">{t("GADGET KEY")}</label>
             <button
               type="button"
               onClick={handleForgotPassword}
               className="text-[9px] text-emerald-400 hover:text-emerald-300 font-mono uppercase tracking-wider transition cursor-pointer"
             >
-              LOST KEY?
+              {t("LOST KEY?")}
             </button>
           </div>
           <div className="relative">
@@ -249,7 +251,7 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
               onChange={(e) => setRememberMe(e.target.checked)}
               className="rounded bg-black border-white/15 text-emerald-500 focus:ring-transparent w-3.5 h-3.5"
             />
-            <span>REMEMBER SQUAD CONTROLLER</span>
+            <span>{t("REMEMBER SQUAD CONTROLLER")}</span>
           </label>
         </div>
 
@@ -263,7 +265,7 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
             <Loader className="w-4 h-4 animate-spin text-black" />
           ) : (
             <>
-              🔒 CONNECT DOCK
+              🔒 {t("CONNECT DOCK")}
               <ChevronRight className="w-4 h-4" />
             </>
           )}
@@ -273,7 +275,7 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
       {/* Google Link divider layout */}
       <div className="flex items-center my-5 select-none">
         <div className="flex-1 h-px bg-white/5" />
-        <span className="text-[8px] text-gray-500 font-mono uppercase px-3 tracking-widest">TACTICAL MULTI-PORTAL</span>
+        <span className="text-[8px] text-gray-500 font-mono uppercase px-3 tracking-widest">{t("TACTICAL MULTI-PORTAL")}</span>
         <div className="flex-1 h-px bg-white/5" />
       </div>
 
@@ -300,7 +302,7 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
             d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
           />
         </svg>
-        <span>ENTER WITH GOOGLE</span>
+        <span>{t("ENTER WITH GOOGLE")}</span>
       </button>
 
       {/* Switch Form button */}
@@ -309,7 +311,7 @@ export default function LoginForm({ onToggleForm, onSuccess }: LoginFormProps) {
           onClick={() => { playFutSound('click'); onToggleForm(); }}
           className="text-gray-400 hover:text-yellow-400 font-mono text-[10px] uppercase tracking-wider transition cursor-pointer"
         >
-          Don't have an account? <strong className="text-emerald-400 hover:underline">Sign Up</strong>
+          {t("Don't have an account?")} <strong className="text-emerald-400 hover:underline">{t("Sign Up")}</strong>
         </button>
       </div>
     </motion.div>

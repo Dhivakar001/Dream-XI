@@ -145,7 +145,7 @@ export default function UserProfileView({
       }, 1200);
 
     } catch (err: any) {
-      console.error('Failed to update profile settings:', err);
+      console.warn('Failed to update profile settings:', err?.message || err);
       setErrorMsg(err.message || 'Error saving changes.');
     } finally {
       setUpdating(false);

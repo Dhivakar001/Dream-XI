@@ -3,22 +3,24 @@ import { motion } from 'motion/react';
 import { Trophy, Star, Shield, Flame, Swords, Compass, Sparkles } from 'lucide-react';
 import { Squad } from '../types';
 import { playFutSound } from '../utils';
+import { useTranslation } from '../lib/LanguageContext';
 
 interface LeaderboardsViewProps {
   squadsList: Squad[];
 }
 
 export default function LeaderboardsView({ squadsList }: LeaderboardsViewProps) {
+  const { t } = useTranslation();
   // Mock high ranking profiles
   const topManagers = [
-    { rank: 1, name: 'Gaffer_XI', wins: 24, loss: 2, points: 280, title: 'Tactical Overload', icon: '👑', color: 'from-yellow-400 via-amber-300 to-yellow-500', height: 'h-40', glow: 'shadow-[0_0_25px_rgba(250,204,21,0.25)]' },
-    { rank: 2, name: 'Samba_Coach', wins: 19, loss: 4, points: 210, title: 'Chemistry Scholar', icon: '🥈', color: 'from-slate-300 via-slate-100 to-slate-400', height: 'h-32', glow: 'shadow-[0_0_20px_rgba(226,232,240,0.2)]' },
-    { rank: 3, name: 'Zlatan_Disciple', wins: 17, loss: 5, points: 190, title: 'Aura Overload', icon: '🥉', color: 'from-amber-600 via-amber-500 to-amber-750', height: 'h-28', glow: 'shadow-[0_0_15px_rgba(245,158,11,0.15)]' }
+    { rank: 1, name: 'Gaffer_XI', wins: 24, loss: 2, points: 280, title: t('Tactical Overload'), icon: '👑', color: 'from-yellow-400 via-amber-300 to-yellow-500', height: 'h-40', glow: 'shadow-[0_0_25px_rgba(250,204,21,0.25)]' },
+    { rank: 2, name: 'Samba_Coach', wins: 19, loss: 4, points: 210, title: t('Chemistry Scholar'), icon: '🥈', color: 'from-slate-300 via-slate-100 to-slate-400', height: 'h-32', glow: 'shadow-[0_0_20px_rgba(226,232,240,0.2)]' },
+    { rank: 3, name: 'Zlatan_Disciple', wins: 17, loss: 5, points: 190, title: t('Aura Overload'), icon: '🥉', color: 'from-amber-600 via-amber-500 to-amber-750', height: 'h-28', glow: 'shadow-[0_0_15px_rgba(245,158,11,0.15)]' }
   ];
 
   const offPodiumManagers = [
-    { rank: 4, name: 'Fifa_Vet_2026', wins: 15, loss: 8, points: 160, title: 'Squad Pro', icon: '👤' },
-    { rank: 5, name: 'Dream_Tactics', wins: 12, loss: 9, points: 130, title: 'Analyst', icon: '👤' }
+    { rank: 4, name: 'Fifa_Vet_2026', wins: 15, loss: 8, points: 160, title: t('Squad Pro'), icon: '👤' },
+    { rank: 5, name: 'Dream_Tactics', wins: 12, loss: 9, points: 130, title: t('Analyst'), icon: '👤' }
   ];
 
   // Sort squads by likes or ratings desc
@@ -37,13 +39,13 @@ export default function LeaderboardsView({ squadsList }: LeaderboardsViewProps) 
         
         <div className="text-center mb-8">
           <span className="text-[10px] font-black tracking-widest text-[#10b981] bg-emerald-950/40 px-3.5 py-1.5 rounded-full border border-emerald-500/20 uppercase">
-            ⚡ WORLD TACTICKER ARENA ⚡
+            {t("⚡ WORLD TACTICKER ARENA ⚡")}
           </span>
           <h2 className="text-2xl font-black text-white uppercase tracking-tight mt-3">
-            LEADERBOARD LEGENDS
+            {t("LEADERBOARD LEGENDS")}
           </h2>
           <p className="text-gray-400 text-xs font-mono mt-1">
-            Gaffers with the highest rating setups and absolute visual aura
+            {t("Gaffers with the highest rating setups and absolute visual aura")}
           </p>
         </div>
 
@@ -90,7 +92,7 @@ export default function LeaderboardsView({ squadsList }: LeaderboardsViewProps) 
         <div className="md:col-span-6 bg-[#12111c] border border-white/5 p-5 rounded-2xl shadow-xl backdrop-blur flex flex-col gap-4">
           <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider block border-b border-white/5 pb-2.5">
             <Trophy className="w-4 h-4 text-yellow-400 inline mr-1 mb-0.5" />
-            OUTSTANDING RUNNERS
+            {t("OUTSTANDING RUNNERS")}
           </span>
 
           <div className="flex flex-col gap-3">
@@ -103,7 +105,7 @@ export default function LeaderboardsView({ squadsList }: LeaderboardsViewProps) 
                   <span className="text-sm font-black text-gray-500 w-5 select-none font-sans">#{man.rank}</span>
                   <div className="min-w-0 font-sans">
                     <span className="font-sans font-black text-xs text-white block truncate uppercase hover:text-yellow-400 cursor-pointer">@{man.name}</span>
-                    <span className="text-[9px] text-gray-500 uppercase tracking-wider block mt-1">STATUS: {man.title}</span>
+                    <span className="text-[9px] text-gray-500 uppercase tracking-wider block mt-1">{t("STATUS:")} {man.title}</span>
                   </div>
                 </div>
 
@@ -120,13 +122,13 @@ export default function LeaderboardsView({ squadsList }: LeaderboardsViewProps) 
         <div className="md:col-span-6 bg-[#12111c] border border-white/5 p-5 rounded-2xl shadow-xl backdrop-blur flex flex-col gap-4">
           <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider block border-b border-white/5 pb-2.5">
             <Flame className="w-4 h-4 text-fuchsia-400 inline mr-1 mb-0.5 animate-pulse" />
-            MOST VALUED TEAM BUILDS
+            {t("MOST VALUED TEAM BUILDS")}
           </span>
 
           <div className="flex flex-col gap-3">
             {rankedSquads.length === 0 ? (
               <div className="text-center py-12 text-gray-500 font-mono text-xs">
-                No active squads compiled in database indices.
+                {t("No active squads compiled in database indices.")}
               </div>
             ) : (
               rankedSquads.map((sq, idx) => (
@@ -138,13 +140,13 @@ export default function LeaderboardsView({ squadsList }: LeaderboardsViewProps) 
                     <span className="text-sm font-black text-transparent bg-clip-text bg-gradient-to-tr from-pink-500 to-indigo-500 w-5 select-none">#{idx + 1}</span>
                     <div className="min-w-0 leading-tight">
                       <span className="font-sans font-black text-xs text-white block truncate uppercase">{sq.name}</span>
-                      <span className="text-[9px] text-gray-500 font-mono tracking-wider block mt-1 uppercase">GAFFER: @{sq.userName}</span>
+                      <span className="text-[9px] text-gray-500 font-mono tracking-wider block mt-1 uppercase">{t("GAFFER:")} @{sq.userName}</span>
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-black text-yellow-400 block uppercase tracking-wider">{sq.rating} OVR</span>
-                    <span className="text-[9px] text-[#10b981] font-bold uppercase font-mono mt-1 block">{sq.chemistry}% CHEM LINK</span>
+                    <span className="text-xs font-black text-yellow-400 block uppercase tracking-wider">{sq.rating} {t("OVR")}</span>
+                    <span className="text-[9px] text-[#10b981] font-bold uppercase font-mono mt-1 block">{sq.chemistry}% {t("CHEM LINK")}</span>
                   </div>
                 </div>
               ))

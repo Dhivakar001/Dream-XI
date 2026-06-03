@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { Sparkles, Star, Trophy, Shield, Zap, TrendingUp, Award, Flame, Globe } from 'lucide-react';
 import { Player } from '../types';
 import { playFutSound } from '../utils';
+import { useTranslation } from '../lib/LanguageContext';
 
 const getCountryAbbrev = (nation: string) => {
   if (!nation) return 'INT';
@@ -65,6 +66,7 @@ export default function HolographicCard({
   size = 'md',
   showStats = true,
 }: HolographicCardProps) {
+  const { t } = useTranslation();
   const getCardStyle = (type: Player['cardType'], rating: number) => {
     // If rating is 97+, they deserve GOAT status!
     if (rating >= 97) {
@@ -259,7 +261,7 @@ export default function HolographicCard({
           {card.badgeType === 'icon' && <Zap className="w-2.5 h-2.5 text-cyan-400 animate-pulse" />}
           {card.badgeType === 'future' && <TrendingUp className="w-2.5 h-2.5 text-pink-500 animate-bounce" />}
           {card.badgeType === 'gold' && <Shield className="w-2.5 h-2.5 text-emerald-400" />}
-          <span>{card.label}</span>
+          <span>{t(card.label)}</span>
         </div>
       </div>
 
@@ -337,7 +339,7 @@ export default function HolographicCard({
       <div className="w-full mt-auto select-none z-10">
         <div className="flex justify-between items-center text-[9px] text-[#009E49] font-mono mb-1 select-none">
           <span className="flex items-center gap-1 font-black tracking-wide">
-            ⚡ AURA INDEX:
+            {t("⚡ AURA INDEX:")}
           </span>
           <span className="font-extrabold text-[#FBE116] tracking-widest text-right select-none">
             {player.auraRating}%

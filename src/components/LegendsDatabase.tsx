@@ -16,6 +16,7 @@ import { Player } from '../types';
 import { PLAYERS_DB } from '../playersData';
 import { playFutSound } from '../utils';
 import HolographicCard from './HolographicCard';
+import { useTranslation } from '../lib/LanguageContext';
 
 interface LegendsDatabaseProps {
   onSetSquad?: (squad: any) => void;
@@ -391,6 +392,7 @@ const getPlayerTimeline = (p: Player): TimelineStep[] => {
 };
 
 export default function LegendsDatabase({}: LegendsDatabaseProps) {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [posFilter, setPosFilter] = useState('ALL');
   const [eraFilter, setEraFilter] = useState('ALL');
@@ -502,7 +504,7 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
       <div className="bg-slate-900 border border-white/5 p-4 rounded-2xl shadow-xl backdrop-blur flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 select-none leading-none">
         
         <div className="flex items-center gap-3">
-          <span className="text-gray-400 font-black text-xs uppercase tracking-wider select-none">PREFILTERS:</span>
+          <span className="text-gray-400 font-black text-xs uppercase tracking-wider select-none">{t("PREFILTERS:")}</span>
           <div className="flex flex-wrap gap-2">
             
             {/* Search terms */}
@@ -514,7 +516,7 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search Star or Icon..."
+                placeholder={t("Search Star or Icon...")}
                 className="pl-8 pr-3 py-1.5 bg-black border border-white/10 text-white rounded-lg focus:outline-none focus:border-yellow-400 text-xs font-bold leading-none shrink-0"
               />
             </div>
@@ -525,11 +527,11 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
               onChange={(e) => { playFutSound('click'); setPosFilter(e.target.value); }}
               className="bg-black border border-white/10 text-white text-[11px] p-1.5 rounded-lg focus:outline-none font-mono"
             >
-              <option value="ALL">ALL POSITIONS</option>
-              <option value="ST">STRIKERS / FORWARDS</option>
-              <option value="MID">MIDFIELDERS</option>
-              <option value="DEF">DEFENDERS</option>
-              <option value="GK">GOALKEEPERS</option>
+              <option value="ALL">{t("ALL POSITIONS")}</option>
+              <option value="ST">{t("STRIKERS / FORWARDS")}</option>
+              <option value="MID">{t("MIDFIELDERS")}</option>
+              <option value="DEF">{t("DEFENDERS")}</option>
+              <option value="GK">{t("GOALKEEPERS")}</option>
             </select>
 
             {/* Era filter */}
@@ -538,16 +540,16 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
               onChange={(e) => { playFutSound('click'); setEraFilter(e.target.value); }}
               className="bg-black border border-white/10 text-white text-[11px] p-1.5 rounded-lg focus:outline-none font-mono"
             >
-              <option value="ALL">ALL ERAS</option>
-              <option value="Current">CURRENT PRO STARS</option>
-              <option value="Legend">LEGENDS / ICONS</option>
+              <option value="ALL">{t("ALL ERAS")}</option>
+              <option value="Current">{t("CURRENT PRO STARS")}</option>
+              <option value="Legend">{t("LEGENDS / ICONS")}</option>
             </select>
           </div>
         </div>
 
         {/* Counter count badges */}
         <div className="text-right font-mono text-xs text-slate-400">
-          Showing <strong className="text-white">{filteredPlayers.length}</strong> star assets inside stadium index.
+          {t("Showing")} <strong className="text-white">{filteredPlayers.length}</strong> {t("star assets inside stadium index.")}
         </div>
       </div>
 
@@ -563,14 +565,14 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
               <div className="flex items-center gap-2">
                 <Scale className="w-5 h-5 text-yellow-400" />
                 <span className="text-xs text-slate-200">
-                  Compare selected: <b>{compareA?.name || '---'}</b> versus <b>{compareB?.name || '(Select next player below)'}</b>
+                  {t("Compare selected:")} <b>{compareA?.name || '---'}</b> {t("versus")} <b>{compareB?.name || t("(Select next player below)")}</b>
                 </span>
               </div>
               <button
                 onClick={clearCompare}
                 className="text-[10px] font-mono font-bold text-red-400 uppercase tracking-widest bg-slate-900 border border-white/10 px-3 py-1.5 rounded-lg hover:border-red-400 transition"
               >
-                Reset
+                {t("Reset")}
               </button>
             </div>
           )}
@@ -578,14 +580,14 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
           {/* Quick instructions indicator */}
           <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5 pl-1.5">
             <Sparkles className="w-3.5 h-3.5 text-yellow-500 animate-pulse" />
-            <span>Click any card to load deep-dive timeline. Use "+ Compare Badge" to draft comparison.</span>
+            <span>{t("Click any card to load deep-dive timeline. Use \"+ Compare Badge\" to draft comparison.")}</span>
           </div>
 
           <div className="flex flex-wrap gap-4 justify-center py-2">
             {filteredPlayers.length === 0 ? (
               <div className="text-center py-12 text-gray-500 w-full bg-slate-900/40 rounded-2xl border border-white/5">
                 <ShieldAlert className="w-8 h-8 text-yellow-500/80 mx-auto mb-2 animate-pulse" />
-                No match targets discovered with selected parameters.
+                {t("No match targets discovered with selected parameters.")}
               </div>
             ) : (
               filteredPlayers.map(player => {
@@ -606,13 +608,13 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                         selectForComparison(player);
                       }}
                     >
-                      ⚔️ Compare
+                      {t("⚔️ Compare")}
                     </div>
 
                     {/* Timeline active selected indicator */}
                     {isDeepDiveActive && (
                       <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-yellow-400 text-black px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest z-20 shadow-[0_0_10px_#facc15]">
-                        Active Deep-Dive
+                        {t("Active Deep-Dive")}
                       </div>
                     )}
 
@@ -620,7 +622,7 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                     {isSelectedForCompare && (
                       <div className="absolute inset-0 bg-yellow-400/10 border-2 border-yellow-400 rounded-xl flex items-center justify-center p-3 text-center pointer-events-none select-none z-10">
                         <span className="bg-black/95 border border-yellow-500/30 text-yellow-400 font-sans font-black text-[9px] px-2.5 py-1.5 rounded-xl uppercase tracking-widest shadow-md">
-                          Slot Assigned
+                          {t("Slot Assigned")}
                         </span>
                       </div>
                     )}
@@ -645,7 +647,7 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                📅 Career Timeline
+                {t("📅 Career Timeline")}
               </button>
               <button
                 onClick={() => { playFutSound('click'); setSidebarTab('compare'); }}
@@ -655,7 +657,7 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                🆚 Stats Compare
+                {t("🆚 Stats Compare")}
               </button>
             </div>
 
@@ -681,7 +683,7 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                     </div>
                     <div className="flex-1 min-w-0 leading-tight">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-yellow-400 font-extrabold text-[11px] font-mono">{selectedPlayer.rating} OVR</span>
+                        <span className="text-yellow-400 font-extrabold text-[11px] font-mono">{selectedPlayer.rating} {t("OVR")}</span>
                         <span className="text-[9px] text-gray-400">• {selectedPlayer.position}</span>
                       </div>
                       <h2 className="text-sm font-black text-white truncate uppercase font-sans tracking-tight mt-0.5">{selectedPlayer.name}</h2>
@@ -695,29 +697,29 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                       onClick={() => {
                         playFutSound('click');
                         if (!compareA) {
-                          setCompareA(selectedPlayer);
-                          setSidebarTab('compare');
+                           setCompareA(selectedPlayer);
+                           setSidebarTab('compare');
                         } else if (!compareB && compareA.id !== selectedPlayer.id) {
-                          setCompareB(selectedPlayer);
-                          setShowComparison(true);
-                          setSidebarTab('compare');
+                           setCompareB(selectedPlayer);
+                           setShowComparison(true);
+                           setSidebarTab('compare');
                         } else {
-                          setCompareA(selectedPlayer);
-                          setCompareB(null);
-                          setSidebarTab('compare');
+                           setCompareA(selectedPlayer);
+                           setCompareB(null);
+                           setSidebarTab('compare');
                         }
                       }}
                       className="flex-1 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl text-[10px] font-bold uppercase tracking-wider transition cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       <ArrowRightLeft className="w-3.5 h-3.5" />
-                      Add to Comparison Slot
+                      {t("Add to Comparison Slot")}
                     </button>
                   </div>
 
                   {/* Vertical Timeline Track Title */}
                   <div className="text-[10px] text-gray-400 uppercase tracking-wider font-extrabold font-mono flex items-center gap-1.5 border-b border-white/5 pb-2 mb-1 mt-1">
                     <Activity className="w-3.5 h-3.5 text-yellow-500 animate-pulse" />
-                    <span>Club Career Timeline</span>
+                    <span>{t("Club Career Timeline")}</span>
                   </div>
 
                   {/* Vertical scroll list of timeline elements */}
@@ -743,14 +745,14 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                           </div>
 
                           <h3 className="font-extrabold text-white text-[11px] mb-1.5 uppercase font-sans tracking-tight">
-                            {step.title}
+                            {t(step.title)}
                           </h3>
 
                           <ul className="flex flex-col gap-1 list-none pl-0 leading-relaxed text-[10px] text-slate-300 font-mono">
                             {step.highlights.map((light, hIdx) => (
                               <li key={hIdx} className="flex items-start gap-1">
                                 <span className="text-yellow-500 shrink-0 select-none">🏆</span>
-                                <span>{light}</span>
+                                <span>{t(light)}</span>
                               </li>
                             ))}
                           </ul>
@@ -775,42 +777,42 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                       <div className="text-center font-sans w-5/12">
                         <div className="text-xs font-black text-white truncate">{compareA.name}</div>
                         <span className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-[8px] text-yellow-400 mt-1 inline-block font-mono uppercase font-black uppercase">
-                          {compareA.cardType}
+                          {t(compareA.cardType)}
                         </span>
                       </div>
 
                       <div className="text-center text-yellow-500 font-sans font-bold italic w-2/12 select-none">
-                        VS
+                        {t("VS")}
                       </div>
 
                       <div className="text-center font-sans w-5/12">
                         <div className="text-xs font-black text-white truncate">{compareB.name}</div>
                         <span className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-[8px] text-yellow-400 mt-1 inline-block font-mono uppercase font-black uppercase">
-                          {compareB.cardType}
+                          {t(compareB.cardType)}
                         </span>
                       </div>
                     </div>
 
                     {/* Comparisons stats listings */}
                     <div className="flex flex-col mb-4">
-                      {renderCompareStatsRow('Pace (PAC)', 'pac')}
-                      {renderCompareStatsRow('Shooting (SHO)', 'sho')}
-                      {renderCompareStatsRow('Passing (PAS)', 'pas')}
-                      {renderCompareStatsRow('Dribbling (DRI)', 'dri')}
-                      {renderCompareStatsRow('Defending (DEF)', 'def')}
-                      {renderCompareStatsRow('Physical (PHY)', 'phy')}
+                      {renderCompareStatsRow(t('Pace (PAC)'), 'pac')}
+                      {renderCompareStatsRow(t('Shooting (SHO)'), 'sho')}
+                      {renderCompareStatsRow(t('Passing (PAS)'), 'pas')}
+                      {renderCompareStatsRow(t('Dribbling (DRI)'), 'dri')}
+                      {renderCompareStatsRow(t('Defending (DEF)'), 'def')}
+                      {renderCompareStatsRow(t('Physical (PHY)'), 'phy')}
                     </div>
 
                     {/* Aura side-by-side spec list card */}
                     <div className="bg-gradient-to-r from-emerald-950/10 to-teal-950/10 border border-emerald-500/10 p-4 rounded-xl font-mono mb-4 text-center select-none">
                       <label className="text-[9px] text-gray-400 uppercase tracking-widest block mb-2 font-mono font-bold">
-                        🔥 STADIUM AURA INDEX MATCH
+                        {t("🔥 STADIUM AURA INDEX MATCH")}
                       </label>
                       <div className="flex justify-between items-baseline select-none text-[11px]">
                         <span className={`font-black ${compareA.auraRating > compareB.auraRating ? 'text-emerald-400' : 'text-gray-300'}`}>
                           {compareA.auraRating}%
                         </span>
-                        <span className="text-[9px] text-gray-500 uppercase tracking-wider font-light">swagger score</span>
+                        <span className="text-[9px] text-gray-500 uppercase tracking-wider font-light">{t("swagger score")}</span>
                         <span className={`font-black ${compareB.auraRating > compareA.auraRating ? 'text-emerald-400' : 'text-gray-300'}`}>
                           {compareB.auraRating}%
                         </span>
@@ -820,23 +822,23 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                     {/* Trophy cabinet highlights */}
                     <div className="bg-black/40 border border-white/5 p-4 rounded-xl flex flex-col gap-2 font-sans select-none">
                       <span className="text-[10px] text-gray-400 uppercase tracking-widest font-mono font-bold block mb-2">
-                        🏆 HISTORIC CABINETS:
+                        {t("🏆 HISTORIC CABINETS:")}
                       </span>
                       <div className="grid grid-cols-2 gap-3 leading-relaxed text-[10px] text-gray-300 font-mono">
                         <div>
-                          <span className="text-slate-400 font-sans font-bold uppercase tracking-wider block border-b border-white/5 pb-1 mb-1 text-[9px]">@{compareA.name.split(' ')[0]}</span>
+                           <span className="text-slate-400 font-sans font-bold uppercase tracking-wider block border-b border-white/5 pb-1 mb-1 text-[9px]">@{compareA.name.split(' ')[0]}</span>
                           <ul className="flex flex-col gap-1 list-none pl-0">
                             {compareA.achievements?.slice(0, 2).map((ach, idx) => (
-                              <li key={idx}>🏆 {ach}</li>
-                            )) || <li>None registered</li>}
+                              <li key={idx}>🏆 {t(ach)}</li>
+                            )) || <li>{t("None registered")}</li>}
                           </ul>
                         </div>
                         <div>
-                          <span className="text-slate-400 font-sans font-bold uppercase tracking-wider block border-b border-white/5 pb-1 mb-1 text-[9px]">@{compareB.name.split(' ')[0]}</span>
+                           <span className="text-slate-400 font-sans font-bold uppercase tracking-wider block border-b border-white/5 pb-1 mb-1 text-[9px]">@{compareB.name.split(' ')[0]}</span>
                           <ul className="flex flex-col gap-1 list-none pl-0">
                             {compareB.achievements?.slice(0, 2).map((ach, idx) => (
-                              <li key={idx}>🏆 {ach}</li>
-                            )) || <li>None registered</li>}
+                              <li key={idx}>🏆 {t(ach)}</li>
+                            )) || <li>{t("None registered")}</li>}
                           </ul>
                         </div>
                       </div>
@@ -846,7 +848,7 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                       onClick={clearCompare}
                       className="w-full mt-5 py-3 border border-red-500/20 text-red-400 bg-slate-900 rounded-xl font-black uppercase text-[10px] tracking-wider hover:bg-slate-800 transition cursor-pointer"
                     >
-                      Clear Comparison
+                      {t("Clear Comparison")}
                     </button>
 
                   </motion.div>
@@ -855,12 +857,12 @@ export default function LegendsDatabase({}: LegendsDatabaseProps) {
                 <div className="text-center py-12 text-slate-500 font-mono flex flex-col items-center">
                   <Scale className="w-8 h-8 text-slate-700 mb-2 rotate-12 animate-pulse" />
                   <p className="leading-relaxed mb-4">
-                    Select any <b>two player cards</b> in the left database grid using the <b>⚔️ Compare</b> button to load comparative benchmark graphs.
+                    {t("Select any two player cards in the left database grid using the ⚔️ Compare button to load comparative benchmark graphs.")}
                   </p>
                   {compareA && !compareB && (
                     <div className="bg-black/30 text-emerald-400 border border-emerald-400/10 rounded-xl p-3 text-[10px] text-left w-full">
-                      <b>Slot A Assigned:</b> {compareA.name} <br/>
-                      Click <b>⚔️ Compare</b> on another card on the left to complete your match-up faceoff!
+                      <b>{t("Slot A Assigned:")}</b> {compareA.name} <br/>
+                      {t("Click compare on another card on the left to complete your match-up faceoff!")}
                     </div>
                   )}
                 </div>

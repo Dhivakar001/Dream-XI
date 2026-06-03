@@ -79,7 +79,7 @@ export async function saveSquadToCloud(squad: Squad, userId: string): Promise<{ 
 
     return { success: true, squad: savedSquad };
   } catch (err: any) {
-    console.error('Failed to upsert to Supabase:', err);
+    console.warn('Failed to upsert to Supabase:', err?.message || err);
     return { success: false, error: err };
   }
 }
@@ -121,8 +121,8 @@ export async function loadSquadsFromCloud(userId?: string): Promise<Squad[]> {
       auraScore: row.aura_score,
       createdAt: row.created_at,
     }));
-  } catch (err) {
-    console.error('loadSquadsFromCloud crashed:', err);
+  } catch (err: any) {
+    console.warn('loadSquadsFromCloud crashed:', err?.message || err);
     return [];
   }
 }
@@ -134,12 +134,12 @@ export async function deleteSquadFromCloud(squadId: string): Promise<boolean> {
   try {
     const { error } = await supabase.from('squads').delete().eq('id', squadId);
     if (error) {
-      console.error('deleteSquadFromCloud warning:', error.message);
+      console.warn('deleteSquadFromCloud warning:', error.message);
       return false;
     }
     return true;
-  } catch (err) {
-    console.error('deleteSquadFromCloud crashed:', err);
+  } catch (err: any) {
+    console.warn('deleteSquadFromCloud crashed:', err?.message || err);
     return false;
   }
 }

@@ -4,6 +4,7 @@ import { Play, RotateCcw, CupSoda, Trophy, User, ShieldAlert, Zap, Timer, BarCha
 import { Squad, MatchEvent, SimulationResult, Player } from '../types';
 import { playFutSound } from '../utils';
 import HolographicCard from './HolographicCard';
+import { useTranslation } from '../lib/LanguageContext';
 
 interface MatchSimulatorProps {
   userSquad: Squad | null;
@@ -11,6 +12,7 @@ interface MatchSimulatorProps {
 }
 
 export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulatorProps) {
+  const { t } = useTranslation();
   const [selectedOpponentId, setSelectedOpponentId] = useState<string>('');
   const [simResult, setSimResult] = useState<SimulationResult | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
@@ -35,6 +37,9 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
     setMinutes(0);
     setVisibleEvents([]);
     
+    // Play kickoff referee whistle!
+    playFutSound('kickoff');
+
     const interval = setInterval(() => {
       setMinutes(prev => {
         const nextMin = prev + 3;
@@ -45,12 +50,21 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
 
         // Sound cues for goals
         const justScored = currentEvents.some(e => e.time === nextMin && e.type === 'GOAL');
-        if (justScored) playFutSound('success');
+        if (justScored) {
+          playFutSound('success');
+        } else {
+          // Play a referee whistle blow on foul / yellow / red card bookings!
+          const justCarded = currentEvents.some(e => e.time === nextMin && (e.type === 'YELLOW' || e.type === 'RED'));
+          if (justCarded) {
+            playFutSound('whistle');
+          }
+        }
 
         if (nextMin >= 90) {
           clearInterval(interval);
           setIsSimulating(false);
-          playFutSound('stadium');
+          // Play final full-time whistle blow sequence!
+          playFutSound('fulltime');
           return 90;
         }
         return nextMin;
@@ -246,9 +260,9 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
       {!userSquad && (
         <div className="bg-slate-900/60 border border-white/5 rounded-2xl p-10 text-center text-gray-400 font-mono text-xs shadow-xl backdrop-blur">
           <CupSoda className="w-10 h-10 mx-auto text-yellow-500/80 mb-3 animate-[pulse_2s_infinite]" />
-          <h4 className="font-black text-white text-sm uppercase tracking-wider mb-2">TELEMETRY PREPARATION</h4>
+          <h4 className="font-black text-white text-sm uppercase tracking-wider mb-2">{t("TELEMETRY PREPARATION")}</h4>
           <p className="max-w-md mx-auto leading-relaxed mb-4">
-            Build your ultimate squad in the <b>DREAM XI BUILDER</b> first in natural positions before triggering match simulations.
+            {t("Build your ultimate squad in the DREAM XI BUILDER first in natural positions before triggering match simulations.")}
           </p>
         </div>
       )}
@@ -257,14 +271,14 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
       {userSquad && !simResult && !isSimulating && (
         <div className="bg-slate-900/95 border border-white/5 rounded-2xl p-6 backdrop-blur shadow-2xl flex flex-col items-center select-none">
           <Trophy className="w-10 h-10 text-yellow-400 mb-3 animate-bounce" />
-          <h2 className="text-lg font-black text-white uppercase tracking-wider mb-2">BATTLE ARENA SIMULATOR</h2>
+          <h2 className="text-lg font-black text-white uppercase tracking-wider mb-2">{t("BATTLE ARENA SIMULATOR")}</h2>
           <p className="text-xs text-gray-400 font-mono text-center max-w-md mb-6">
-            Test your customized squad parameters, tactical formations, and chemistry indexes against iconic legends or community templates.
+            {t("Test your customized squad parameters, tactical formations, and chemistry indexes against iconic legends or community templates.")}
           </p>
 
           <div className="w-full max-w-md bg-black/40 border border-white/5 rounded-xl p-5 mb-6 flex flex-col gap-4 font-mono text-xs">
             <div>
-              <span className="text-[10px] text-gray-400 uppercase tracking-widest block mb-2">CHOOSE YOUR CHALLENGER:</span>
+              <span className="text-[10px] text-gray-400 uppercase tracking-widest block mb-2">{t("CHOOSE YOUR CHALLENGER:")}</span>
               <select
                 value={selectedOpponentId}
                 onChange={(e) => { playFutSound('click'); setSelectedOpponentId(e.target.value); }}
@@ -272,7 +286,7 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
               >
                 {availableOpponents.map(opp => (
                   <option key={opp.id} value={opp.id}>
-                    🤖 {opp.name} (OVR: {opp.rating}, CHEM: {opp.chemistry}%) - {opp.userName}
+                    🤖 {opp.name} ({t("OVR")}: {opp.rating}, {t("CHEM")}: {opp.chemistry}%) - {opp.userName}
                   </option>
                 ))}
               </select>
@@ -282,16 +296,16 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
             <div className="flex justify-between items-center py-4 px-2 select-none">
               <div className="text-center font-sans">
                 <div className="text-sm font-black text-white truncate max-w-[120px]">{userSquad.name}</div>
-                <div className="text-[11px] font-mono text-emerald-400 uppercase">OVR: {userSquad.rating}</div>
+                <div className="text-[11px] font-mono text-emerald-400 uppercase">{t("OVR")}: {userSquad.rating}</div>
               </div>
-              <div className="text-xl font-black text-yellow-400 italic">VS</div>
+              <div className="text-xl font-black text-yellow-400 italic">{t("VS")}</div>
               <div className="text-center font-sans">
                 {(() => {
                   const opp = availableOpponents.find(o => o.id === selectedOpponentId);
                   return (
                     <>
-                      <div className="text-sm font-black text-white truncate max-w-[120px]">{opp?.name || 'Challenger'}</div>
-                      <div className="text-[11px] font-mono text-emerald-400 uppercase">OVR: {opp?.rating || 80}</div>
+                      <div className="text-sm font-black text-white truncate max-w-[120px]">{opp?.name || t('Challenger')}</div>
+                      <div className="text-[11px] font-mono text-emerald-400 uppercase">{t("OVR")}: {opp?.rating || 80}</div>
                     </>
                   );
                 })()}
@@ -304,7 +318,7 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
             className="px-8 py-4 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-black text-xs tracking-wider uppercase flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition cursor-pointer shadow-[0_4px_15px_rgba(234,179,8,0.3)] animate-pulse"
           >
             <Play className="w-4 h-4 fill-black" />
-            START SIMULATION
+            {t("START SIMULATION")}
           </button>
         </div>
       )}
@@ -321,11 +335,11 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
             <div className="flex justify-between items-center w-full max-w-xl pb-2 border-b border-white/5 font-sans mb-5">
               <span className="text-[10px] text-[#10b981] font-black tracking-widest flex items-center gap-1">
                 <Zap className="w-3.5 h-3.5 fill-[#10b981] animate-bounce" />
-                STADIUM LIVE ARENA
+                {t("STADIUM LIVE ARENA")}
               </span>
               <span className="text-[10px] text-gray-400 font-mono flex items-center gap-1 uppercase">
                 <Timer className="w-3.5 h-3.5" />
-                Time: <strong className="text-white">{minutes}' mins</strong>
+                {t("Time:")} <strong className="text-white">{minutes}' {t("mins")}</strong>
               </span>
             </div>
 
@@ -333,7 +347,7 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
             <div className="flex w-full max-w-xl items-center justify-between font-sans px-4 select-none">
               <div className="text-center w-5/12">
                 <h3 className="text-base sm:text-lg font-black text-white uppercase truncate">{userSquad.name}</h3>
-                <span className="text-[10px] text-gray-500 font-mono block mt-1 uppercase">GAFFER: {userSquad.userName}</span>
+                <span className="text-[10px] text-gray-500 font-mono block mt-1 uppercase">{t("GAFFER:")} {userSquad.userName}</span>
               </div>
 
               {/* Score indicators */}
@@ -345,10 +359,10 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
 
               <div className="text-center w-5/12">
                 <h3 className="text-base sm:text-lg font-black text-white uppercase truncate">
-                  {simResult?.squadB.name || 'Opponent'}
+                  {simResult?.squadB.name || t('Opponent')}
                 </h3>
                 <span className="text-[10px] text-gray-500 font-mono block mt-1 uppercase">
-                  GAFFER: {simResult?.squadB.userName || 'Bot'}
+                  {t("GAFFER:")} {simResult?.squadB.userName || t('Bot')}
                 </span>
               </div>
             </div>
@@ -367,7 +381,7 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
                 className="mt-6 flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-700 text-white font-bold text-[10px] uppercase px-4 py-2 rounded-lg border border-white/5 transition"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                RE-DEBATE NEW MATCH
+                {t("RE-DEBATE NEW MATCH")}
               </button>
             )}
           </div>
@@ -376,7 +390,7 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
             {/* Live minute-by-minute Events Timeline (Col 1) */}
             <div className="md:col-span-7 bg-slate-900/90 border border-white/5 rounded-2xl p-5 backdrop-blur shadow-2xl flex flex-col">
               <span className="text-[11px] text-gray-400 font-black uppercase tracking-wider block mb-4 border-b border-white/5 pb-2">
-                MATCH TIMELINE TICKER (90')
+                {t("MATCH TIMELINE TICKER (90')")}
               </span>
 
               {/* Scrollable event listings */}
@@ -384,7 +398,7 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
                 {visibleEvents.length === 0 && (
                   <div className="text-center py-12 text-gray-500 flex flex-col items-center">
                     <Timer className="w-8 h-8 text-slate-600 mb-1.5 animate-pulse" />
-                    Kickoff whistle sounded. Watching tactics play out...
+                    {t("Kickoff whistle sounded. Watching tactics play out...")}
                   </div>
                 )}
                 {visibleEvents.map((evt, idx) => {
@@ -415,14 +429,14 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
                 <div className="bg-slate-900/90 border border-white/5 rounded-2xl p-5 backdrop-blur shadow-2xl">
                   <span className="text-[11px] text-gray-400 font-black uppercase tracking-wider block mb-4 border-b border-white/5 pb-1">
                     <BarChart2 className="w-4 h-4 text-[#10b981] inline mr-1 mb-0.5" />
-                    MATCH TELEMETRY STATS
+                    {t("MATCH TELEMETRY STATS")}
                   </span>
 
                   <div className="flex flex-col gap-4">
                     {/* Possession block */}
                     <div>
                       <div className="flex justify-between items-center text-[10px] text-gray-300 mb-1">
-                        <span>{simResult.stats.possessionA}% POSSESSION</span>
+                        <span>{simResult.stats.possessionA}% {t("POSSESSION")}</span>
                         <span>{simResult.stats.possessionB}%</span>
                       </div>
                       <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden flex">
@@ -434,7 +448,7 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
                     {/* Shots block */}
                     <div>
                       <div className="flex justify-between items-center text-[10px] text-gray-300 mb-1">
-                        <span>{simResult.stats.shotsA} TOTAL SHOTS</span>
+                        <span>{simResult.stats.shotsA} {t("TOTAL SHOTS")}</span>
                         <span>{simResult.stats.shotsB}</span>
                       </div>
                       <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden flex">
@@ -446,7 +460,7 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
                     {/* Fouls block */}
                     <div>
                       <div className="flex justify-between items-center text-[10px] text-gray-300 mb-1">
-                        <span>{simResult.stats.foulsA} FOULS COMMITTED</span>
+                        <span>{simResult.stats.foulsA} {t("FOULS COMMITTED")}</span>
                         <span>{simResult.stats.foulsB}</span>
                       </div>
                       <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden flex">
@@ -461,7 +475,7 @@ export default function MatchSimulator({ userSquad, savedSquads }: MatchSimulato
                 <div className="bg-gradient-to-b from-[#1c1435] to-slate-900 border border-purple-500/25 rounded-2xl p-4 shadow-xl flex flex-col items-center">
                   <span className="text-[10px] text-purple-400 font-extrabold tracking-widest uppercase mb-3 flex items-center gap-1">
                     <Star className="w-3.5 h-3.5 fill-purple-400 text-purple-400 animate-spin-slow" />
-                    MATCH PLAYER MVP (OVR)
+                    {t("MATCH PLAYER MVP (OVR)")}
                   </span>
 
                   <AnimatePresence>

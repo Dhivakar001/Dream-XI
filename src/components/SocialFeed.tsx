@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, Heart, Share2, Flame, User, Send, Compass, Sparkles, AlertCircle } from 'lucide-react';
 import { SocialPost, Comment, Squad } from '../types';
 import { playFutSound } from '../utils';
+import { useTranslation } from '../lib/LanguageContext';
 
 interface SocialFeedProps {
   userId: string;
@@ -23,6 +24,7 @@ export default function SocialFeed({
   onRefreshFeed,
   onSwitchTab,
 }: SocialFeedProps) {
+  const { t } = useTranslation();
   const [postText, setPostText] = useState('');
   const [activeCommentsPostId, setActiveCommentsPostId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState('');
@@ -31,11 +33,11 @@ export default function SocialFeed({
 
   // Trending sidebar hashtags list
   const trendingTags = [
-    { tag: '#Antony360', count: '14.2k takes' },
-    { tag: '#TacticsHybrid', count: '9.8k gafers' },
-    { tag: '#BallonDor', count: '8.4k votes' },
-    { tag: '#AuraIndex', count: '6.1k ratings' },
-    { tag: '#PeleSamba', count: '4.2k duels' }
+    { tag: '#Antony360', count: `14.2k ${t('takes')}` },
+    { tag: '#TacticsHybrid', count: `9.8k ${t('gafers')}` },
+    { tag: '#BallonDor', count: `8.4k ${t('votes')}` },
+    { tag: '#AuraIndex', count: `6.1k ${t('ratings')}` },
+    { tag: '#PeleSamba', count: `4.2k ${t('duels')}` }
   ];
 
   const handleCreatePost = async (e: React.FormEvent) => {
@@ -61,8 +63,8 @@ export default function SocialFeed({
         setPostText('');
         onRefreshFeed();
       }
-    } catch (err) {
-      console.error('Failed to create take', err);
+    } catch (err: any) {
+      console.warn('Failed to create take', err?.message || err);
     }
   };
 
@@ -78,8 +80,8 @@ export default function SocialFeed({
       if (data.success) {
         onRefreshFeed();
       }
-    } catch (err) {
-      console.error('Failed to register like metric', err);
+    } catch (err: any) {
+      console.warn('Failed to register like metric', err?.message || err);
     }
   };
 
@@ -93,8 +95,8 @@ export default function SocialFeed({
       const res = await fetch(`/api/comments/${postId}`);
       const data = await res.json();
       setPostComments(data);
-    } catch (e) {
-      console.error('Failed to query post comment threads', e);
+    } catch (e: any) {
+      console.warn('Failed to query post comment threads', e?.message || e);
     } finally {
       setLoadingComments(false);
     }
@@ -124,8 +126,8 @@ export default function SocialFeed({
         setPostComments(prev => [...prev, data.comment]);
         onRefreshFeed();
       }
-    } catch (err) {
-      console.error('Failed to publish take reply', err);
+    } catch (err: any) {
+      console.warn('Failed to publish take reply', err?.message || err);
     }
   };
 
@@ -160,14 +162,14 @@ export default function SocialFeed({
                 rows={2}
                 value={postText}
                 onChange={(e) => setPostText(e.target.value)}
-                placeholder="Publish a tactical take or squad override... Rate Antony? Defend Mudryk?"
+                placeholder={t("Publish a tactical take or squad override... Rate Antony? Defend Mudryk?")}
                 className="w-full bg-[#08070d] border border-white/10 text-white rounded-xl p-3 focus:outline-none focus:border-emerald-400 font-sans text-xs font-bold leading-normal resize-none"
               />
 
               <div className="flex justify-between items-center select-none pt-1">
                 <span className="text-[9px] text-gray-500 font-mono flex items-center gap-1.5 uppercase font-black">
                   <Flame className="w-3.5 h-3.5 text-red-500 fill-red-500 animate-bounce" />
-                  POSTING AS @{userName}
+                  {t("POSTING AS")} @{userName}
                 </span>
 
                 <button
@@ -176,7 +178,7 @@ export default function SocialFeed({
                   className="px-4 py-2 bg-gradient-to-r from-[#10b981] to-emerald-400 text-black font-black uppercase text-[10px] rounded-lg tracking-wider flex items-center gap-1 cursor-pointer hover:brightness-110 active:scale-95 disabled:opacity-30 transition shadow-[0_0_12px_rgba(16,185,129,0.25)]"
                 >
                   <Send className="w-3 h-3 fill-black" />
-                  PUBLISH TAKE
+                  {t("PUBLISH TAKE")}
                 </button>
               </div>
             </form>
@@ -186,7 +188,7 @@ export default function SocialFeed({
           <div className="flex flex-col gap-5">
             {feedPosts.length === 0 ? (
               <div className="text-center py-12 bg-slate-900 border border-white/5 rounded-2xl text-gray-400">
-                Silence on the feed index. Share a take!
+                {t("Silence on the feed index. Share a take!")}
               </div>
             ) : (
               feedPosts.map(post => {
@@ -210,7 +212,7 @@ export default function SocialFeed({
                         <div className="flex items-center gap-2">
                           <span className="font-extrabold text-white text-xs hover:text-pink-400 transition cursor-pointer">@{post.userName}</span>
                           <span className="px-1.5 py-0.5 rounded bg-violet-950/40 text-[8px] uppercase font-mono border border-violet-500/20 tracking-wider text-fuchsia-400">
-                            VERIFIED CREATOR
+                            {t("VERIFIED CREATOR")}
                           </span>
                         </div>
                         <span className="text-[9px] text-gray-500 truncate leading-none mt-1 font-mono">{post.userBio}</span>
@@ -230,11 +232,11 @@ export default function SocialFeed({
 
                           <div className="min-w-0 leading-tight">
                             <span className="text-[8px] bg-emerald-900/30 text-[#10b981] border border-emerald-500/20 px-1.5 py-0.5 rounded font-mono font-black uppercase tracking-widest block w-max mb-1.5">
-                              SHARED HYBRID SQUAD
+                              {t("SHARED HYBRID SQUAD")}
                             </span>
                             <h4 className="font-black text-sm text-white uppercase truncate">{post.squad.name}</h4>
                             <p className="text-[10px] text-gray-400 font-mono mt-1">
-                              Rating: <strong className="text-white">{post.squad.rating} OVR</strong> • Chemistry: <strong className="text-[#10b981]">{post.squad.chemistry}%</strong>
+                              {t("RATING:")} <strong className="text-white">{post.squad.rating} {t("OVR")}</strong> • {t("CHEMISTRY:")} <strong className="text-[#10b981]">{post.squad.chemistry}%</strong>
                             </p>
                           </div>
 
@@ -242,7 +244,7 @@ export default function SocialFeed({
                             onClick={() => handleInspectSquad(post.squad!)}
                             className="bg-emerald-400 hover:bg-emerald-300 text-black px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest shrink-0 cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.3)] transition"
                           >
-                            Inspect XI
+                            {t("Inspect XI")}
                           </button>
                         </div>
                       )}
@@ -250,16 +252,16 @@ export default function SocialFeed({
                       {/* Micro-Slang quick review bar to feel like Gen Z soccer debates */}
                       <div className="flex flex-wrap gap-1.5 mb-4 select-none">
                         {[
-                          { text: '🔥 W TAKE', class: 'bg-emerald-900/35 border-emerald-500/20 text-emerald-400 text-[8px]' },
-                          { text: '💀 COLD', class: 'bg-indigo-900/35 border-indigo-500/20 text-indigo-400 text-[8px]' },
-                          { text: '👑 HE COOKS', class: 'bg-amber-900/35 border-amber-500/20 text-amber-400 text-[8px]' },
-                          { text: '🤡 NAH', class: 'bg-red-900/35 border-red-500/20 text-red-500 text-[8px]' }
+                          { text: t('🔥 W TAKE'), class: 'bg-emerald-900/35 border-emerald-500/20 text-emerald-400 text-[8px]' },
+                          { text: t('💀 COLD'), class: 'bg-indigo-900/35 border-indigo-500/20 text-indigo-400 text-[8px]' },
+                          { text: t('👑 HE COOKS'), class: 'bg-amber-900/35 border-amber-500/20 text-amber-400 text-[8px]' },
+                          { text: t('🤡 NAH'), class: 'bg-red-900/35 border-red-500/20 text-red-500 text-[8px]' }
                         ].map((p, idx) => (
                           <button
                             key={idx}
                             onClick={() => {
                               playFutSound('success');
-                              alert(`Debate started: You agreed "${p.text}" on @${post.userName}'s take!`);
+                              alert(t("Debate started: You agreed \"{text}\" on @{userName}'s take!").replace("{text}", p.text).replace("{userName}", post.userName));
                             }}
                             className={`px-2 py-1 select-none font-black font-mono border rounded-lg cursor-pointer hover:scale-105 active:scale-95 transition ${p.class}`}
                           >
@@ -304,21 +306,21 @@ export default function SocialFeed({
             
             <span className="text-[10px] text-fuchsia-400 font-black uppercase tracking-widest block mb-4 border-b border-fuchsia-500/25 pb-2.5">
               <Compass className="w-4 h-4 text-fuchsia-400 inline mr-1 mb-0.5 animate-spin-slow" />
-              HOT FOOTBALL TRENDS
+              {t("HOT FOOTBALL TRENDS")}
             </span>
 
             <div className="flex flex-col gap-3.5">
-              {trendingTags.map((t, idx) => (
+              {trendingTags.map((tItem, idx) => (
                 <div key={idx} className="flex gap-3 items-center py-2.5 border-b border-white/5 last:border-0 leading-tight group">
                   <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-fuchsia-600 to-indigo-600 flex items-center justify-center font-black text-white text-[10px] shrink-0">
                     {idx + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <span className="font-sans font-bold text-xs text-white block group-hover:text-yellow-400 cursor-pointer transition truncate">{t.tag}</span>
-                    <span className="text-[9px] text-gray-500 font-mono">{t.count}</span>
+                    <span className="font-sans font-bold text-xs text-white block group-hover:text-yellow-400 cursor-pointer transition truncate">{tItem.tag}</span>
+                    <span className="text-[9px] text-gray-500 font-mono">{tItem.count}</span>
                   </div>
                   <span className="text-[10px] text-emerald-400 font-bold tracking-tight bg-emerald-950/40 px-1.5 py-0.5 rounded leading-none">
-                    🔥 HOT
+                    {t("🔥 HOT")}
                   </span>
                 </div>
               ))}
@@ -346,25 +348,25 @@ export default function SocialFeed({
             >
               <div className="flex justify-between items-center mb-5 pb-3 border-b border-white/10 select-none">
                 <div>
-                  <h3 className="text-sm font-black text-white uppercase tracking-wider">Comments Feed</h3>
-                  <p className="text-[9px] text-gray-500 font-mono">Participate in the soccer debate chain</p>
+                  <h3 className="text-sm font-black text-white uppercase tracking-wider">{t("Comments Feed")}</h3>
+                  <p className="text-[9px] text-gray-500 font-mono">{t("Participate in the soccer debate chain")}</p>
                 </div>
                 <button
                   onClick={() => setActiveCommentsPostId(null)}
-                  className="p-1 rounded bg-slate-900 border border-white/10 hover:border-red-500 hover:text-red-400 text-gray-400 cursor-pointer"
+                  className="p-1 rounded bg-slate-900 border border-white/10 hover:border-red-500 hover:text-red-400 text-gray-400 cursor-pointer text-[10px]"
                 >
-                  Close
+                  {t("Close")}
                 </button>
               </div>
 
               {/* Chat replies Lists */}
               <div className="flex-1 overflow-y-auto flex flex-col gap-3 h-0 pr-1 mb-4">
                 {loadingComments ? (
-                  <div className="text-center py-8 text-gray-500 font-mono text-xs">Loading replies...</div>
+                  <div className="text-center py-8 text-gray-500 font-mono text-xs">{t("Loading replies...")}</div>
                 ) : postComments.length === 0 ? (
                   <div className="text-center py-12 text-gray-500 font-mono flex flex-col items-center">
                     <MessageSquare className="w-8 h-8 text-slate-700 mb-1" />
-                    No match observations. Share your hot reply take!
+                    {t("No match observations. Share your hot reply take!")}
                   </div>
                 ) : (
                   postComments.map(comment => (
@@ -387,7 +389,7 @@ export default function SocialFeed({
                   type="text"
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Draft your take, counter-argument..."
+                  placeholder={t("Draft your take, counter-argument...")}
                   className="flex-1 bg-black border border-white/10 text-white rounded-xl p-3 focus:outline-none focus:border-yellow-400 text-xs text-xs font-bold leading-none font-sans"
                 />
                 <button
@@ -395,7 +397,7 @@ export default function SocialFeed({
                   disabled={!commentText.trim()}
                   className="px-4 py-3 bg-yellow-400 text-black font-black uppercase text-[10px] rounded-xl hover:brightness-110 cursor-pointer disabled:opacity-40 transition"
                 >
-                  REPLY
+                  {t("REPLY")}
                 </button>
               </form>
             </motion.div>

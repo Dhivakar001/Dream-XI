@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Sparkles,
@@ -49,6 +49,9 @@ import MySquadsPage from './pages/MySquadsPage';
 import HolographicCard from './components/HolographicCard';
 import UserDropdown from './components/UserDropdown';
 import ProtectedRoute from './components/ProtectedRoute';
+
+// Import Language Context
+import { useTranslation } from './lib/LanguageContext';
 
 type TabName = 'home' | 'builder' | 'simulator' | 'arena' | 'feed' | 'database' | 'profile' | 'leaderboards' | 'my-squads' | 'settings';
 
@@ -111,8 +114,22 @@ const HERO_SHOWCASE_PLAYERS: Player[] = [
 ];
 
 export default function App() {
+  const { t, language, setLanguage } = useTranslation();
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const { user, profile: authProfile, loading: authLoading, setProfile: setAuthProfile } = useAuth();
   const [authScreen, setAuthScreen] = useState<'login' | 'signup'>('login');
+
+  const [showLeftFade, setShowLeftFade] = useState(false);
+  const [showRightFade, setShowRightFade] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
+
+  const checkScroll = () => {
+    if (navRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = navRef.current;
+      setShowLeftFade(scrollLeft > 5);
+      setShowRightFade(scrollWidth - scrollLeft - clientWidth > 5);
+    }
+  };
 
   const [activeTab, setActiveTab] = useState<TabName>(() => {
     const hash = typeof window !== 'undefined' ? window.location.hash.replace('#', '') : '';
@@ -133,6 +150,26 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  // Monitor navigation bar scroll overflow
+  useEffect(() => {
+    const nav = navRef.current;
+    if (nav) {
+      nav.addEventListener('scroll', checkScroll);
+      checkScroll();
+      window.addEventListener('resize', checkScroll);
+      
+      const t1 = setTimeout(checkScroll, 100);
+      const t2 = setTimeout(checkScroll, 450);
+
+      return () => {
+        nav.removeEventListener('scroll', checkScroll);
+        window.removeEventListener('resize', checkScroll);
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+  }, [language, activeTab]);
+
   // Core telemetry States
   const [loading, setLoading] = useState(true);
   const [availablePlayers, setAvailablePlayers] = useState<Player[]>([]);
@@ -145,6 +182,8 @@ export default function App() {
   // Active sandbox entities
   const [activeSquad, setActiveSquad] = useState<Squad | undefined>(undefined);
   const [squadForAnalysis, setSquadForAnalysis] = useState<Squad | null>(null);
+
+
 
   // Set premium authProfile if loaded from Supabase Cloud
   useEffect(() => {
@@ -170,7 +209,7 @@ export default function App() {
             if (code) {
               const { error } = await supabase.auth.exchangeCodeForSession(code);
               if (error) {
-                console.error('Error exchanging code for session:', error.message);
+                console.warn('Error exchanging code for session:', error.message);
               } else {
                 console.log('Successfully completed PKCE OAuth session exchange.');
               }
@@ -187,14 +226,14 @@ export default function App() {
                 refresh_token
               });
               if (error) {
-                console.error('Error setting OAuth session from hash:', error.message);
+                console.warn('Error setting OAuth session from hash:', error.message);
               } else {
                 console.log('Successfully completed Implicit OAuth session set.');
               }
             }
           }
-        } catch (err) {
-          console.error('Failed to parse and complete OAuth session:', err);
+        } catch (err: any) {
+          console.warn('Failed to parse and complete OAuth session:', err?.message || err);
         }
       }
     };
@@ -304,6 +343,7 @@ export default function App() {
   const refreshSquadsList = async () => {
     try {
       const res = await fetch('/api/squads');
+      if (!res.ok) throw new Error(`Server returned status ${res.status}`);
       const seedSquads = await res.json();
       
       if (user) {
@@ -316,8 +356,8 @@ export default function App() {
       } else {
         setSquadsList(seedSquads);
       }
-    } catch (e) {
-      console.error('Failed to sync squads list', e);
+    } catch (e: any) {
+      console.warn('Failed to sync squads list (using offline state):', e.message || e);
     }
   };
 
@@ -325,20 +365,22 @@ export default function App() {
   const refreshBattlesFeed = async () => {
     try {
       const res = await fetch('/api/battles');
+      if (!res.ok) throw new Error(`Server returned status ${res.status}`);
       const data = await res.json();
       setBattles(data);
-    } catch (e) {
-      console.error('Failed to sync battle feed', e);
+    } catch (e: any) {
+      console.warn('Failed to sync battle feed:', e.message || e);
     }
   };
 
   const refreshFeedPosts = async () => {
     try {
       const res = await fetch('/api/feed');
+      if (!res.ok) throw new Error(`Server returned status ${res.status}`);
       const data = await res.json();
       setFeedPosts(data);
-    } catch (e) {
-      console.error('Failed to sync social posts', e);
+    } catch (e: any) {
+      console.warn('Failed to sync social posts:', e.message || e);
     }
   };
 
@@ -502,21 +544,84 @@ export default function App() {
           </div>
 
           {/* Activity status ticker bento box */}
-          <div className="hidden md:flex items-center gap-5 font-mono text-[10px] text-gray-300 uppercase leading-none bg-[#0B0B0F] border-2 border-black street-shadow-yellow px-4 py-2.5 rounded-2xl">
+          <div className="hidden lg:flex items-center gap-5 font-mono text-[10px] text-gray-300 uppercase leading-none bg-[#0B0B0F] border-2 border-black street-shadow-yellow px-4 py-2.5 rounded-2xl">
             <span className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#FBE116] animate-spin" />
-              STATUS: <strong className="text-white bg-[#009E49] px-1.5 py-1 rounded text-[8px] tracking-tighter flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#FBE116] animate-ping" />ACTIVE GAFFER</strong>
+              {t("STATUS")}: <strong className="text-white bg-[#009E49] px-1.5 py-1 rounded text-[8px] tracking-tighter flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#FBE116] animate-ping" />{t("ACTIVE GAFFER")}</strong>
             </span>
             <span className="flex items-center gap-1.5 border-l border-white/10 pl-5">
-              <Award className="w-3.5 h-3.5 text-[#FBE116] animate-pulse" /> STREAK: <strong className="text-[#FBE116]">Level 4</strong>
+              <Award className="w-3.5 h-3.5 text-[#FBE116] animate-pulse" /> {t("STREAK")}: <strong className="text-[#FBE116]">{t("Level 4")}</strong>
             </span>
             <span className="flex items-center gap-1.5 border-l border-white/10 pl-5">
-              <Flame className="w-3.5 h-3.5 text-pink-400 animate-pulse" /> DEBATES: <strong className="text-pink-400">{battles.length} active</strong>
+              <Flame className="w-3.5 h-3.5 text-pink-400 animate-pulse" /> {t("DEBATES")}: <strong className="text-pink-400">{battles.length} {t("active")}</strong>
             </span>
           </div>
 
           {/* User Auth Action Segment */}
           <div className="flex items-center gap-3" id="header-auth-status">
+            {/* Language Selector Component */}
+            <div className="relative inline-block text-left" id="header-lang-selector">
+              <button
+                onClick={() => {
+                  playFutSound('click');
+                  setLangDropdownOpen(!langDropdownOpen);
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border-2 border-black bg-black/40 hover:bg-black/60 text-white font-mono text-[10px] tracking-tight transition duration-200 cursor-pointer shadow-[2px_2px_0px_#000] active:scale-95"
+                title="Select Language"
+              >
+                <Globe className="w-3.5 h-3.5 text-yellow-500 animate-pulse" />
+                <span className="font-extrabold uppercase font-mono">
+                  {language === 'en' && '🇬🇧 EN'}
+                  {language === 'zh' && '🇨🇳 ZH'}
+                  {language === 'hi' && '🇮🇳 HI'}
+                  {language === 'es' && '🇪🇸 ES'}
+                  {language === 'fr' && '🇫🇷 FR'}
+                  {language === 'pt' && '🇵🇹 PT'}
+                </span>
+              </button>
+
+              {langDropdownOpen && (
+                <>
+                  {/* Backdrop click closer spacer */}
+                  <div 
+                    className="fixed inset-0 z-40 bg-transparent animate-fade-in" 
+                    onClick={() => setLangDropdownOpen(false)} 
+                  />
+                  <div className="absolute right-0 mt-2 w-40 origin-top-right rounded-2xl bg-[#0B0B0F] border-3 border-black text-white shadow-[6px_6px_0px_rgba(0,0,0,1)] z-50 overflow-hidden font-sans">
+                    <div className="py-1 flex flex-col divide-y divide-white/5">
+                      {[
+                        { code: 'en', name: 'English', flag: '🇬🇧' },
+                        { code: 'zh', name: '简体中文', flag: '🇨🇳' },
+                        { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+                        { code: 'es', name: 'Español', flag: '🇪🇸' },
+                        { code: 'fr', name: 'Français', flag: '🇫🇷' },
+                        { code: 'pt', name: 'Português', flag: '🇵🇹' }
+                      ].map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => {
+                            playFutSound('click');
+                            setLanguage(lang.code as any);
+                            setLangDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-xs font-bold font-sans flex items-center gap-2.5 transition duration-150 ${
+                            language === lang.code
+                              ? 'bg-[#FBE116] text-black font-black'
+                              : 'hover:bg-white/10 text-gray-250'
+                          }`}
+                        >
+                          <span className="text-sm select-none">{lang.flag}</span>
+                          <span className="font-sans font-black uppercase text-[9px] tracking-wider">{lang.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+
+
             {user && profile ? (
               <UserDropdown
                 profile={profile}
@@ -540,7 +645,7 @@ export default function App() {
                   className="px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border-2 border-black transition font-black uppercase cursor-pointer"
                   id="header-login-btn"
                 >
-                  Login
+                  {t("Login")}
                 </button>
                 <button
                   onClick={() => {
@@ -550,7 +655,7 @@ export default function App() {
                   className="px-3.5 py-2.5 rounded-xl bg-[#FBE116] text-black hover:scale-105 active:scale-95 border-2 border-black font-sans font-black uppercase transition cursor-pointer shadow-[3px_3px_0px_#000]"
                   id="header-signup-btn"
                 >
-                  Sign Up
+                  {t("Sign Up")}
                 </button>
               </div>
             )}
@@ -559,97 +664,95 @@ export default function App() {
       </header>
 
       {/* 3. Segmented Navigation Bar - Slab Buttons */}
-      <nav id="navigation-root" className="border-b-[3px] border-black bg-[#050408]/90 py-4 select-none sticky top-[66px] z-20 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 flex gap-3 overflow-x-auto font-mono text-xs whitespace-nowrap scrollbar-none items-center justify-start sm:justify-center">
+      <nav id="navigation-root" className="border-b-[3px] border-black bg-[#050408]/90 py-3.5 select-none sticky top-[66px] z-20 backdrop-blur-md relative overflow-hidden">
+        {/* Left & Right Fade Indicators for Scroll Overflow */}
+        <div className={`absolute left-0 top-0 bottom-[#3px] w-14 bg-gradient-to-r from-[#050408] via-[#050408]/85 to-transparent pointer-events-none z-10 transition-opacity duration-300 ease-in-out ${showLeftFade ? 'opacity-100' : 'opacity-0'}`} />
+        <div className={`absolute right-0 top-0 bottom-[#3px] w-14 bg-gradient-to-l from-[#050408] via-[#050408]/85 to-transparent pointer-events-none z-10 transition-opacity duration-300 ease-in-out ${showRightFade ? 'opacity-100' : 'opacity-0'}`} />
+
+        <div 
+          ref={navRef}
+          className="max-w-7xl mx-auto overflow-x-auto font-mono text-xs whitespace-nowrap scrollbar-none py-1.5 overflow-y-visible"
+        >
+          <div className="w-fit mx-auto px-6 flex gap-2 lg:gap-3 items-center justify-start">
           
           <button
             onClick={() => handleTabChange('home')}
-            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
+            className={`px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black shrink-0 ${
               activeTab === 'home'
                 ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-[4px_4px_0px_#FBE116] rotate-[1.5deg]'
-                : 'bg-black/60 text-gray-300 hover:text-emerald-400 hover:bg-black'
+                : 'bg-black/60 text-gray-300 hover:text-emerald-400 hover:bg-black hover:scale-102'
             }`}
           >
-            <Home className="w-4 h-4 text-current" /> Home Hub
+            <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-current" /> {t("Home Hub")}
           </button>
 
           <button
             onClick={() => handleTabChange('builder')}
-            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
+            className={`px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black shrink-0 ${
               activeTab === 'builder'
                 ? 'bg-[#FBE116] text-[#050408] shadow-[4px_4px_0px_#009E49] rotate-[-2deg]'
-                : 'bg-black/60 text-gray-300 hover:text-[#FBE116] hover:bg-black'
+                : 'bg-black/60 text-gray-300 hover:text-[#FBE116] hover:bg-black hover:scale-102'
             }`}
           >
-            <Compass className="w-4 h-4 text-current animate-spin-slow" style={{ animationDuration: '8s' }} /> Tactical Pitch
+            <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-current animate-spin-slow" style={{ animationDuration: '8s' }} /> {t("Tactical Pitch")}
           </button>
 
           <button
             onClick={() => handleTabChange('feed')}
-            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
+            className={`px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black shrink-0 ${
               activeTab === 'feed'
                 ? 'bg-[#009E49] text-white shadow-[4px_4px_0px_#002776] rotate-[1.5deg]'
-                : 'bg-black/60 text-gray-300 hover:text-[#009E49] hover:bg-black'
+                : 'bg-black/60 text-gray-300 hover:text-[#009E49] hover:bg-black hover:scale-102'
             }`}
           >
-            <MessageCircle className="w-4 h-4 text-current animate-pulse" /> Trench Feed
+            <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-current animate-pulse" /> {t("Trench Feed")}
           </button>
 
           <button
             onClick={() => handleTabChange('arena')}
-            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
+            className={`px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black shrink-0 ${
               activeTab === 'arena'
                 ? 'bg-[#002776] text-white shadow-[4px_4px_0px_#ec4899] rotate-[-1.5deg]'
-                : 'bg-black/60 text-gray-300 hover:text-[#002776] hover:bg-black'
+                : 'bg-black/60 text-gray-300 hover:text-[#002776] hover:bg-black hover:scale-102'
             }`}
           >
-            <Swords className="w-4 h-4 text-current animate-bounce" /> Live Debates
+            <Swords className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-current animate-bounce" /> {t("Live Debates")}
           </button>
 
           <button
             onClick={() => handleTabChange('simulator')}
-            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
+            className={`px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black shrink-0 ${
               activeTab === 'simulator'
                 ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[4px_4px_0px_#000] rotate-[1deg]'
-                : 'bg-black/60 text-gray-300 hover:text-cyan-400 hover:bg-black'
+                : 'bg-black/60 text-gray-300 hover:text-cyan-400 hover:bg-black hover:scale-102'
             }`}
           >
-            <Cpu className="w-4 h-4 text-current animate-pulse" /> Match Sims
+            <Cpu className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-current animate-pulse" /> {t("Match Sims")}
           </button>
 
           <button
             onClick={() => handleTabChange('database')}
-            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
+            className={`px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black shrink-0 ${
               activeTab === 'database'
                 ? 'bg-[#FBE116] text-[#050408] shadow-[4px_4px_0px_#000] rotate-[-2deg]'
-                : 'bg-black/60 text-gray-300 hover:text-yellow-400 hover:bg-black'
+                : 'bg-black/60 text-gray-300 hover:text-yellow-400 hover:bg-black hover:scale-102'
             }`}
           >
-            <Database className="w-4 h-4 text-current" /> Star DB
+            <Database className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-current" /> {t("Star DB")}
           </button>
 
           <button
             onClick={() => handleTabChange('leaderboards')}
-            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
+            className={`px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black shrink-0 ${
               activeTab === 'leaderboards'
                 ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-[4px_4px_0px_#FBE116] rotate-[1.5deg]'
-                : 'bg-black/60 text-gray-300 hover:text-orange-400 hover:bg-black'
+                : 'bg-black/60 text-gray-300 hover:text-orange-400 hover:bg-black hover:scale-102'
             }`}
           >
-            <Trophy className="w-4 h-4 text-current" /> Rankings
+            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-current" /> {t("Rankings")}
           </button>
 
-          <button
-            onClick={() => handleTabChange('profile')}
-            className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 border-2 border-black ${
-              activeTab === 'profile'
-                ? 'bg-[#009E49] text-white shadow-[4px_4px_0px_#FBE116] rotate-[-1deg]'
-                : 'bg-black/60 text-gray-300 hover:text-emerald-400 hover:bg-black'
-            }`}
-          >
-            <User className="w-4 h-4 text-current" /> Gaffer Profile
-          </button>
-
+          </div>
         </div>
       </nav>
 
@@ -797,49 +900,49 @@ export default function App() {
           className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'home' ? 'text-[#FBE116] font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
         >
           <Trophy className="w-4 h-4 text-current" />
-          <span>Hub</span>
+          <span>{t("Hub")}</span>
         </button>
         <button
           onClick={() => { playFutSound('click'); handleTabChange('builder'); }}
           className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'builder' ? 'text-emerald-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
         >
           <Compass className="w-4 h-4 text-current" />
-          <span>Pitch</span>
+          <span>{t("Pitch")}</span>
         </button>
         <button
           onClick={() => { playFutSound('click'); handleTabChange('feed'); }}
           className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'feed' ? 'text-purple-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
         >
           <MessageCircle className="w-4 h-4 text-current" />
-          <span>Trench</span>
+          <span>{t("Trench")}</span>
         </button>
         <button
           onClick={() => { playFutSound('click'); handleTabChange('arena'); }}
           className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'arena' ? 'text-pink-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
         >
           <Swords className="w-4 h-4 text-current" />
-          <span>Debates</span>
+          <span>{t("Debates")}</span>
         </button>
         <button
           onClick={() => { playFutSound('click'); handleTabChange('simulator'); }}
           className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'simulator' ? 'text-cyan-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
         >
           <Tv className="w-4 h-4 text-current" />
-          <span>Sims</span>
+          <span>{t("Sims")}</span>
         </button>
         <button
           onClick={() => { playFutSound('click'); handleTabChange('profile'); }}
-          className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'profile' ? 'text-orange-400 font-extrabold translate-y-[-2px]' : 'text-gray-400'}`}
+          className={`flex flex-col items-center gap-1 flex-1 py-1 transition ${activeTab === 'profile' ? 'text-orange-400 font-extrabold translate-y-[-2px]' : 'text-[#878A94]'}`}
         >
           <User className="w-4 h-4 text-current" />
-          <span>Gaffer</span>
+          <span>{t("Gaffer")}</span>
         </button>
       </div>
 
       {/* 6. Footer */}
       <footer className="border-t border-white/10 bg-[#0B0B0F] py-8 text-center select-none mt-auto">
         <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest leading-none">
-          © {new Date().getFullYear()} DREAM XI INC • STADIUM HYBRID SYSTEMS INC
+          © {new Date().getFullYear()} DREAM XI INC • {t("STADIUM HYBRID SYSTEMS INC")}
         </p>
       </footer>
 

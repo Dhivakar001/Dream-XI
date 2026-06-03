@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Cpu, CheckCircle2, AlertTriangle, ShieldAlert, Sparkles, Wand2, Lightbulb } from 'lucide-react';
 import { Squad } from '../types';
 import { playFutSound } from '../utils';
+import { useTranslation } from '../lib/LanguageContext';
 
 interface AIAnalysisProps {
   squad: Squad | null;
@@ -26,6 +27,7 @@ interface AnalysisResult {
 }
 
 export default function AIAnalysis({ squad }: AIAnalysisProps) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
@@ -33,11 +35,11 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
   // Periodic sporting statuses to keep loading screen extremely engaging
   const [loadingStep, setLoadingStep] = useState(0);
   const loadingMessages = [
-    'Benchmarking player synergy algorithms...',
-    'Feeding position heatmaps to Gemini analytic layers...',
-    'Synthesizing clinical forward statistics...',
-    'Measuring tactical alignment across chemistry linkages...',
-    'Calibrating combined squad football aura indices...'
+    t('Benchmarking player synergy algorithms...'),
+    t('Feeding position heatmaps to Gemini analytic layers...'),
+    t('Synthesizing clinical forward statistics...'),
+    t('Measuring tactical alignment across chemistry linkages...'),
+    t('Calibrating combined squad football aura indices...')
   ];
 
   useEffect(() => {
@@ -73,10 +75,10 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
         const data = await res.json();
         setResult(data);
         playFutSound('success');
-      } catch (e) {
+      } catch (e: any) {
         if (ignore) return;
-        console.error('Failed to query squad analytical module', e);
-        setErrorCode('Failed to complete tactical telemetry.');
+        console.warn('Failed to query squad analytical module:', e?.message || e);
+        setErrorCode(t('Failed to complete tactical telemetry.'));
       } finally {
         if (!ignore) {
           setLoading(false);
@@ -94,12 +96,12 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
   // Render a beautiful interactive SVG radar chart based on statistics values
   const renderRadarChart = (ratings: AnalysisResult['ratings']) => {
     const categories = [
-      { key: 'attack', label: 'ATTACK' },
-      { key: 'midfield', label: 'MIDFIELD' },
-      { key: 'defense', label: 'DEFENSE' },
-      { key: 'pace', label: 'PACE' },
-      { key: 'creativity', label: 'CREATIVITY' },
-      { key: 'tacticalBalance', label: 'BALANCE' }
+      { key: 'attack', label: t('ATTACK') },
+      { key: 'midfield', label: t('MIDFIELD') },
+      { key: 'defense', label: t('DEFENSE') },
+      { key: 'pace', label: t('PACE') },
+      { key: 'creativity', label: t('CREATIVITY') },
+      { key: 'tacticalBalance', label: t('BALANCE') }
     ];
 
     const width = 320;
@@ -232,9 +234,9 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
       {!squad && (
         <div className="bg-black border-2 border-black rounded-2xl p-10 text-center text-gray-400 font-mono text-xs shadow-[6px_6px_0px_#000] select-none">
           <Cpu className="w-10 h-10 mx-auto text-[#FBE116] mb-3 animate-spin-slow" />
-          <h4 className="font-extrabold text-white text-sm uppercase tracking-wider mb-2 font-outfit">GEN AI CHAT TELEMETRY READY</h4>
+          <h4 className="font-extrabold text-white text-sm uppercase tracking-wider mb-2 font-outfit">{t("GEN AI CHAT TELEMETRY READY")}</h4>
           <p className="max-w-md mx-auto text-gray-400 leading-relaxed mb-4">
-            Place some of the worlds finest legends and star players on the tactical pitch, then click <b className="text-[#FBE116]">AI SQUAD COMMENTARY</b> above to unlock real-time intelligence feeds!
+            {t("Place some of the worlds finest legends and star players on the tactical pitch, then click")} <b className="text-[#FBE116]">{t("AI SQUAD COMMENTARY")}</b> {t("above to unlock real-time intelligence feeds!")}
           </p>
         </div>
       )}
@@ -250,7 +252,7 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
           </div>
 
           <h4 className="font-black text-white text-sm uppercase tracking-widest mb-2 font-outfit italic">
-            🇧🇷 CALIBRATING TACTICAL AURA DEBATE
+            🇧🇷 {t("CALIBRATING TACTICAL AURA DEBATE")}
           </h4>
           
           <div className="text-xs text-slate-300 font-mono italic max-w-sm h-6 overflow-hidden">
@@ -267,7 +269,7 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
       {squad && !loading && errorCode && (
         <div className="bg-black border-2 border-red-500 rounded-2xl p-6 text-center text-rose-400 font-mono text-xs">
           <ShieldAlert className="w-8 h-8 text-red-500 mx-auto mb-2 animate-bounce" />
-          <p className="font-bold uppercase tracking-wider mb-1">Telemetry Loop Interrupted</p>
+          <p className="font-bold uppercase tracking-wider mb-1">{t("Telemetry Loop Interrupted")}</p>
           <p className="text-gray-400">{errorCode}</p>
         </div>
       )}
@@ -287,10 +289,10 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
             <div className="flex-1">
               <span className="text-[10px] text-black font-extrabold bg-[#009E49] text-white px-2.5 py-1 rounded border border-black uppercase tracking-widest flex items-center gap-1.5 mb-2.5 select-none w-fit">
                 <Wand2 className="w-3.5 h-3.5 animate-pulse" />
-                🇧🇷 CHAT DOS CRISTAL • UNFILTERED AI REPORT
+                🇧🇷 {t("CHAT DOS CRISTAL • UNFILTERED AI REPORT")}
               </span>
               <h2 className="text-xl font-black text-white uppercase tracking-tight font-outfit mb-2">
-                GAFFER REVIEW: {squad.name}
+                {t("GAFFER REVIEW:")} {squad.name}
               </h2>
               <p className="text-sm text-gray-200 leading-relaxed font-sans">
                 {result.comment}
@@ -300,7 +302,7 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
             {/* Combined Football Aura Meter */}
             <div className="bg-neutral-950 border-2 border-black rounded-xl p-4 sm:w-65 w-full shrink-0 flex flex-col justify-center">
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-[9px] text-[#FBE116] font-mono uppercase tracking-wider font-bold">STREET AURA CERT:</span>
+                <span className="text-[9px] text-[#FBE116] font-mono uppercase tracking-wider font-bold">{t("STREET AURA CERT:")}</span>
                 <span className="text-xl font-black text-[#FBE116] font-graffiti">{result.aura}%</span>
               </div>
               <div className="w-full bg-black rounded-full h-2 border border-black overflow-hidden">
@@ -315,7 +317,7 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
           {/* Radar Chart (Col 1) */}
           <div className="md:col-span-4 flex items-center justify-center bg-zinc-950 border-2 border-black p-4 rounded-xl">
             <div className="w-full flex flex-col items-center">
-              <span className="text-[10px] text-gray-400 font-mono uppercase tracking-widest block mb-1">STREET RADAR RATINGS</span>
+              <span className="text-[10px] text-gray-400 font-mono uppercase tracking-widest block mb-1">{t("STREET RADAR RATINGS")}</span>
               {renderRadarChart(result.ratings)}
             </div>
           </div>
@@ -326,7 +328,7 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
             <div className="bg-zinc-950 border-2 border-[#009E49]/30 rounded-xl p-4">
               <h4 className="text-[11px] font-black text-[#009E49] uppercase tracking-widest flex items-center gap-1.5 mb-3 select-none font-outfit">
                 <CheckCircle2 className="w-4 h-4" />
-                TACTICAL STRENGTHS
+                {t("TACTICAL STRENGTHS")}
               </h4>
               <ul className="flex flex-col gap-2 list-none text-left">
                 {result.strengths.map((str, idx) => (
@@ -342,7 +344,7 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
             <div className="bg-zinc-950 border-2 border-[#FBE116]/30 rounded-xl p-4">
               <h4 className="text-[11px] font-black text-[#FBE116] uppercase tracking-widest flex items-center gap-1.5 mb-3 select-none font-outfit">
                 <AlertTriangle className="w-4 h-4" />
-                POTENTIAL EXPOSURES
+                {t("POTENTIAL EXPOSURES")}
               </h4>
               <ul className="flex flex-col gap-2 list-none text-left">
                 {result.weaknesses.map((weak, idx) => (
@@ -358,7 +360,7 @@ export default function AIAnalysis({ squad }: AIAnalysisProps) {
             <div className="p-4 bg-orange-950/20 border-2 border-[#FBE116]/20 rounded-xl">
               <h4 className="text-[11px] font-black text-[#FBE116] uppercase tracking-widest flex items-center gap-1.5 mb-2.5 select-none font-outfit">
                 <Lightbulb className="w-4 h-4 text-amber-300" />
-                STREET LOCK TACTICAL INSTRUCTIONS
+                {t("STREET LOCK TACTICAL INSTRUCTIONS")}
               </h4>
               <ul className="flex flex-col gap-1.5 list-none text-left">
                 {result.suggestions.map((sug, idx) => (

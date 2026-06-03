@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { User, Mail, Lock, Eye, EyeOff, Loader, Sparkles, Trophy, ChevronRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { playFutSound } from '../../utils';
+import { useTranslation } from '../../lib/LanguageContext';
 
 interface SignupFormProps {
   onToggleForm: () => void;
@@ -10,6 +11,7 @@ interface SignupFormProps {
 }
 
 export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps) {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,19 +30,19 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
 
   // Password strength calculator
   const checkPasswordStrength = (pass: string) => {
-    if (!pass) return { rating: 'UNRANKED', color: 'text-gray-600', width: 'w-0' };
-    if (pass.length < 6) return { rating: 'WARM WATER COOK (TRASH)', color: 'text-red-500', width: 'w-1/4 bg-red-500' };
-    if (pass.length < 8) return { rating: 'ROOKIE GAFFER (MID)', color: 'text-orange-500', width: 'w-2/4 bg-orange-500' };
+    if (!pass) return { rating: t('UNRANKED'), color: 'text-gray-600', width: 'w-0' };
+    if (pass.length < 6) return { rating: t('WARM WATER COOK (TRASH)'), color: 'text-red-500', width: 'w-1/4 bg-red-500' };
+    if (pass.length < 8) return { rating: t('ROOKIE GAFFER (MID)'), color: 'text-orange-500', width: 'w-2/4 bg-orange-500' };
     
     // Check complexity
     const hasNumbers = /\d/.test(pass);
     const hasSpecial = /[^A-Za-z0-9]/.test(pass);
     
     if (hasNumbers && hasSpecial && pass.length >= 10) {
-      return { rating: 'AURA KING LEVEL (GOD)', color: 'text-yellow-400', width: 'w-full bg-gradient-to-r from-yellow-400 to-emerald-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]' };
+      return { rating: t('AURA KING LEVEL (GOD)'), color: 'text-yellow-400', width: 'w-full bg-gradient-to-r from-yellow-400 to-emerald-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]' };
     }
     
-    return { rating: 'TACTICIAN MASTER (STRONG)', color: 'text-emerald-400', width: 'w-3/4 bg-emerald-400' };
+    return { rating: t('TACTICIAN MASTER (STRONG)'), color: 'text-emerald-400', width: 'w-3/4 bg-emerald-400' };
   };
 
   const strength = checkPasswordStrength(password);
@@ -54,31 +56,31 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
     setErrorMsg('');
 
     if (!username) {
-      setUsernameError('Choose your gaffer nick/username!');
+      setUsernameError(t('Choose your gaffer nick/username!'));
       isValid = false;
     } else if (username.length < 3) {
-      setUsernameError('Min 3 tactical coordinates required!');
+      setUsernameError(t('Min 3 tactical coordinates required!'));
       isValid = false;
     }
 
     if (!email) {
-      setEmailError('Email is required, Gaffer!');
+      setEmailError(t('Email is required, Gaffer!'));
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      setEmailError('Input a valid tactical transfer-window email address!');
+      setEmailError(t('Input a valid tactical transfer-window email address!'));
       isValid = false;
     }
 
     if (!password) {
-      setPasswordError('Gaffer credentials need coordinates!');
+      setPasswordError(t('Gaffer credentials need coordinates!'));
       isValid = false;
     } else if (password.length < 8) {
-      setPasswordError('Min 8 premium characters required!');
+      setPasswordError(t('Min 8 premium characters required!'));
       isValid = false;
     }
 
     if (password !== confirmPassword) {
-      setConfirmError('Security keys mismatch! Realign coordinates.');
+      setConfirmError(t('Security keys mismatch! Realign coordinates.'));
       isValid = false;
     }
 
@@ -111,7 +113,7 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
         setErrorMsg(error.message);
         playFutSound('click');
       } else {
-        setSuccessMsg("ACCOUNT REGISTERED SUCCESSFULLY! Auto-syncing profile.");
+        setSuccessMsg(t("ACCOUNT REGISTERED SUCCESSFULLY! Auto-syncing profile."));
         playFutSound('success');
         
         // Supposing everything works, proceed to success trigger
@@ -120,7 +122,7 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
         }, 1200);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Signup pipeline failed. Verify coordinates!');
+      setErrorMsg(err.message || t('Signup pipeline failed. Verify coordinates!'));
     } finally {
       setLoading(false);
     }
@@ -150,13 +152,13 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
           'width=600,height=700'
         );
         if (!authWindow) {
-          setErrorMsg('Please allow popups for this site to register with Google!');
+          setErrorMsg(t('Please allow popups for this site to register with Google!'));
         }
       } else {
-        setErrorMsg('Auth URL generation succeeded but returned empty address.');
+        setErrorMsg(t('Auth URL generation succeeded but returned empty address.'));
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Google Auth initiation failed.');
+      setErrorMsg(err.message || t('Google Auth initiation failed.'));
     } finally {
       setLoading(false);
     }
@@ -183,30 +185,30 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
 
       <div className="text-center mb-6">
         <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center justify-center gap-1.5">
-          Create Account <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse" />
+          {t("Create Account")} <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse" />
         </h2>
         <p className="text-gray-400 text-xs mt-1.5 font-mono">
-          Join the community and build legendary football squads.
+          {t("Join the community and build legendary football squads.")}
         </p>
       </div>
 
       {/* Global alerts */}
       {errorMsg && (
         <div className="bg-red-950/40 border border-red-500/30 text-red-400 text-[10px] p-3 rounded-xl font-mono uppercase tracking-wider mb-4 leading-normal">
-          ⚠️ TACTICAL ERROR: {errorMsg}
+          ⚠️ {t("TACTICAL ERROR")}: {errorMsg}
         </div>
       )}
 
       {successMsg && (
         <div className="bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-[10px] p-3 rounded-xl font-mono uppercase tracking-wider mb-4 leading-normal">
-          ✅ SYSTEM: {successMsg}
+          ✅ {t("SYSTEM")}: {successMsg}
         </div>
       )}
 
       <form onSubmit={handleSignup} className="flex flex-col gap-4">
         {/* Username */}
         <div>
-          <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block mb-1.5 pl-1.5">GAFFER NICKNAME (@)</label>
+          <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block mb-1.5 pl-1.5">{t("GAFFER NICKNAME (@)")}</label>
           <div className="relative">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
               <User className="w-4 h-4" />
@@ -226,7 +228,7 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
 
         {/* Email */}
         <div>
-          <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block mb-1.5 pl-1.5">EMAIL ADDR</label>
+          <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block mb-1.5 pl-1.5">{t("EMAIL ADDR")}</label>
           <div className="relative">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
               <Mail className="w-4 h-4" />
@@ -246,7 +248,7 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
 
         {/* Password */}
         <div>
-          <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block mb-1.5 pl-1.5">SECURITY KEY</label>
+          <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block mb-1.5 pl-1.5">{t("SECURITY KEY")}</label>
           <div className="relative">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
               <Lock className="w-4 h-4" />
@@ -271,7 +273,7 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
           {password && (
             <div className="mt-2.5 pl-1.5 pr-1.5">
               <div className="flex justify-between font-mono text-[8px] uppercase tracking-wider mb-1">
-                <span>SECURITY LEVEL:</span>
+                <span>{t("SECURITY LEVEL:")}</span>
                 <span className={`font-black ${strength.color}`}>{strength.rating}</span>
               </div>
               <div className="h-1.5 w-full bg-black/50 rounded-full overflow-hidden">
@@ -287,7 +289,7 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
 
         {/* Confirm password */}
         <div>
-          <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block mb-1.5 pl-1.5">CONFIRM SECURITY KEY</label>
+          <label className="text-[9px] text-gray-500 font-mono tracking-widest uppercase block mb-1.5 pl-1.5">{t("CONFIRM SECURITY KEY")}</label>
           <div className="relative">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
               <Lock className="w-4 h-4" />
@@ -315,7 +317,7 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
             <Loader className="w-4 h-4 animate-spin text-white" />
           ) : (
             <>
-              🏆 CREATE ACCOUNT
+              🏆 {t("CREATE ACCOUNT")}
               <ChevronRight className="w-4 h-4" />
             </>
           )}
@@ -325,7 +327,7 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
       {/* Google Link divider layout */}
       <div className="flex items-center my-5 select-none">
         <div className="flex-1 h-px bg-white/5" />
-        <span className="text-[8px] text-gray-500 font-mono uppercase px-3 tracking-widest">TACTICAL MULTI-PORTAL</span>
+        <span className="text-[8px] text-gray-500 font-mono uppercase px-3 tracking-widest">{t("TACTICAL MULTI-PORTAL")}</span>
         <div className="flex-1 h-px bg-white/5" />
       </div>
 
@@ -352,7 +354,7 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
             d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
           />
         </svg>
-        <span>REGISTER WITH Google</span>
+        <span>{t("REGISTER WITH Google")}</span>
       </button>
 
       {/* Switch Form button */}
@@ -361,7 +363,7 @@ export default function SignupForm({ onToggleForm, onSuccess }: SignupFormProps)
           onClick={() => { playFutSound('click'); onToggleForm(); }}
           className="text-gray-400 hover:text-yellow-400 font-mono text-[10px] uppercase tracking-wider transition cursor-pointer"
         >
-          Already have an account? <strong className="text-fuchsia-400 hover:underline">Login</strong>
+          {t("Already have an account?")} <strong className="text-fuchsia-400 hover:underline">{t("Login")}</strong>
         </button>
       </div>
     </motion.div>

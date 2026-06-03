@@ -185,7 +185,7 @@ function loadDB() {
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
     return JSON.parse(raw);
   } catch (err) {
-    console.error('Error reading JSON DB, initializing with empty template', err);
+    console.warn('Error reading JSON DB, initializing with empty template', err);
     return {
       users: [DEFAULT_USER],
       squads: INITIAL_SQUADS,
@@ -201,7 +201,7 @@ function writeDB(data: any) {
   try {
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
   } catch (err) {
-    console.error('Failed to write back data', err);
+    console.warn('Failed to write back data', err);
   }
 }
 
@@ -771,8 +771,8 @@ app.post('/api/gemini/analyze', async (req: Request, res: Response) => {
 
     const output = JSON.parse(response.text.trim());
     res.json(output);
-  } catch (err) {
-    console.error('Gemini API Call failed, fallback used', err);
+  } catch (err: any) {
+    console.warn('Gemini API Call failed, fallback used:', err?.message || err);
     res.json(getFallbackAnalysis());
   }
 });

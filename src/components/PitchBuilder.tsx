@@ -7,6 +7,7 @@ import { saveSquadToCloud } from '../lib/supabaseDb';
 
 import { calculateSquadChemistry, calculateSquadRating, calculateSquadAura, playFutSound } from '../utils';
 import HolographicCard from './HolographicCard';
+import { useTranslation } from '../lib/LanguageContext';
 
 interface PitchBuilderProps {
   userId: string;
@@ -25,6 +26,7 @@ export default function PitchBuilder({
   availablePlayers,
   activeSquad,
 }: PitchBuilderProps) {
+  const { t } = useTranslation();
   // Config state
   const [formationName, setFormationName] = useState<FormationName>('4-3-3');
   const [squadName, setSquadName] = useState('My Dream XI');
@@ -376,8 +378,8 @@ export default function PitchBuilder({
         onSetSquad(finalSquad);
         playFutSound('success');
       }
-    } catch (e) {
-      console.error('Failed to preserve squad', e);
+    } catch (e: any) {
+      console.warn('Failed to preserve squad', e?.message || e);
       setIsSaving(false);
     }
   };
@@ -411,7 +413,7 @@ export default function PitchBuilder({
         {/* Pitch Toolbar header */}
         <div className="w-full max-w-3xl flex flex-wrap gap-3 items-center justify-between mb-4 bg-slate-900/80 border border-white/5 p-3 rounded-xl backdrop-blur">
           <div className="flex items-center gap-3">
-            <span className="text-gray-400 font-bold text-xs uppercase tracking-wider">TACTICS:</span>
+            <span className="text-gray-400 font-bold text-xs uppercase tracking-wider">{t("TACTICS:")}</span>
             <div className="flex gap-1.5 flex-wrap">
               {(Object.keys(FORMATIONS) as FormationName[]).map(fname => (
                 <button
@@ -431,7 +433,7 @@ export default function PitchBuilder({
 
           <div className="flex flex-wrap items-center gap-2.5">
             <div className="flex items-center gap-1">
-              <span className="text-[9px] text-[#FBE116] font-mono font-black tracking-wider uppercase select-none">STYLE:</span>
+              <span className="text-[9px] text-[#FBE116] font-mono font-black tracking-wider uppercase select-none">{t("STYLE:")}</span>
               <select
                 value={draftStrategy}
                 onChange={(e) => {
@@ -439,31 +441,31 @@ export default function PitchBuilder({
                   setDraftStrategy(e.target.value as any);
                 }}
                 className="bg-black/95 border border-white/15 text-white text-[10px] px-2 py-1.5 rounded-lg font-mono font-bold focus:outline-none focus:border-emerald-400 cursor-pointer text-center"
-                title="Choose Auto-Draft generation flavor"
+                title={t("Choose Auto-Draft generation flavor")}
               >
-                <option value="elite">🏆 ELITE META</option>
-                <option value="hybrid">🔥 GLOBAL HYBRID</option>
-                <option value="chaotic">🎭 STREET WILD</option>
-                <option value="retro">⏳ VINTAGE ICONS</option>
-                <option value="current">⚡ NEXT-GEN STARS</option>
+                <option value="elite">🏆 {t("ELITE META")}</option>
+                <option value="hybrid">🔥 {t("GLOBAL HYBRID")}</option>
+                <option value="chaotic">🎭 {t("STREET WILD")}</option>
+                <option value="retro">⏳ {t("VINTAGE ICONS")}</option>
+                <option value="current">⚡ {t("NEXT-GEN STARS")}</option>
               </select>
             </div>
 
             <button
               onClick={triggerAutoDraft}
               className="flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-green-400 text-black px-3.5 py-1.5 rounded-lg text-xs font-black shadow-[0_0_12px_rgba(16,185,129,0.3)] hover:opacity-90 transition"
-              title="Draft squad automatically using selected style!"
+              title={t("Draft squad automatically using selected style!")}
             >
               <Users className="w-3.5 h-3.5" />
-              AUTO-DRAFT
+              {t("AUTO-DRAFT")}
             </button>
             <button
               onClick={clearPitch}
               className="flex items-center gap-1 bg-slate-800 text-gray-400 hover:text-white px-3 py-1.5 rounded-lg text-xs font-medium transition"
-              title="Clear current squad slots"
+              title={t("Clear current squad slots")}
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              RESET XI
+              {t("RESET XI")}
             </button>
           </div>
         </div>
@@ -596,16 +598,16 @@ export default function PitchBuilder({
 
           <h3 className="font-extrabold text-xs tracking-widest text-[#10b981] uppercase mb-4 pb-2 border-b border-white/5 flex items-center gap-1.5">
             <Trophy className="w-4 h-4 text-emerald-400" />
-            TEAM PERFORMANCE
+            {t("TEAM PERFORMANCE")}
           </h3>
 
           <div className="grid grid-cols-2 gap-4">
             {/* Rating Metric */}
             <div className="bg-slate-800/40 border border-white/5 rounded-xl p-3 text-center transform hover:scale-[1.02] transition">
-              <span className="text-[9px] text-gray-400 font-mono tracking-wider uppercase block mb-1">TEAM RATING:</span>
+              <span className="text-[9px] text-gray-400 font-mono tracking-wider uppercase block mb-1">{t("TEAM RATING:")}</span>
               <div className="inline-flex items-baseline gap-1">
                 <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-300 drop-shadow-[0_0_8px_rgba(250,204,21,0.2)]">{teamRating}</span>
-                <span className="text-yellow-400 font-extrabold text-[10px]">OVR</span>
+                <span className="text-yellow-400 font-extrabold text-[10px]">{t("OVR")}</span>
               </div>
               <div className="w-full bg-slate-700/50 rounded-full h-1 mt-2.5 overflow-hidden">
                 <div className="bg-yellow-400 h-1 rounded-full" style={{ width: `${teamRating}%` }} />
@@ -614,7 +616,7 @@ export default function PitchBuilder({
 
             {/* Chemistry Metric */}
             <div className="bg-slate-800/40 border border-white/5 rounded-xl p-3 text-center transform hover:scale-[1.02] transition">
-              <span className="text-[9px] text-gray-400 font-mono tracking-wider uppercase block mb-1">CHEMISTRY:</span>
+              <span className="text-[9px] text-gray-400 font-mono tracking-wider uppercase block mb-1">{t("CHEMISTRY:")}</span>
               <div className="inline-flex items-baseline gap-1">
                 <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-300 drop-shadow-[0_0_8px_rgba(16,185,129,0.2)]">{chemistryResult.total}</span>
                 <span className="text-emerald-500 text-[10px] font-bold">/100</span>
@@ -636,20 +638,20 @@ export default function PitchBuilder({
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[9px] text-gray-400 font-mono tracking-wider uppercase block">SQUAD AURA INDEX:</span>
+                    <span className="text-[9px] text-gray-400 font-mono tracking-wider uppercase block">{t("SQUAD AURA INDEX:")}</span>
                     <span className="text-xl font-black text-white block leading-none mt-1">
-                      {teamAura > 0 ? `${teamAura}% AURA` : '0% AURA'}
+                      {teamAura > 0 ? `${teamAura}% ${t("AURA")}` : `0% ${t("AURA")}`}
                     </span>
                   </div>
                   <div className={`px-2.5 py-1 rounded-lg ${badge.textClass} text-[10px] font-black tracking-wider uppercase border border-current bg-black/40`}>
-                    {badge.text}
+                    {t(badge.text)}
                   </div>
                 </div>
 
                 <div className="w-full bg-black/40 border border-white/5 rounded-lg p-2 flex items-center justify-between">
-                  <span className="text-[10px] text-gray-400 font-mono uppercase">TIER LEVEL:</span>
+                  <span className="text-[10px] text-gray-400 font-mono uppercase">{t("TIER LEVEL:")}</span>
                   <span className={`text-[11px] font-bold ${badge.textClass} tracking-widest`}>
-                    {teamAura > 0 ? badge.rating : 'NO AURA YET'}
+                    {teamAura > 0 ? t(badge.rating) : t('NO AURA YET')}
                   </span>
                 </div>
               </div>
@@ -657,7 +659,7 @@ export default function PitchBuilder({
           })()}
 
           <p className="text-[9px] text-gray-400 mt-4 leading-relaxed font-mono">
-            💡 Chemistry yields crucial precision. Pair up players from the same <b>clubs</b>, <b>countries</b>, or <b>leagues</b> in their natural positions to max synergistic output!
+            💡 {t("Chemistry yields crucial precision. Pair up players from the same clubs, countries, or leagues in their natural positions to max synergistic output!")}
           </p>
         </div>
 
@@ -669,7 +671,7 @@ export default function PitchBuilder({
             className="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition cursor-pointer disabled:opacity-50 disabled:pointer-events-none shadow-[0_0_15px_rgba(234,179,8,0.3)]"
           >
             <Cpu className="w-4 h-4 animate-spin-slow" />
-            AI SQUAD COMMENTARY
+            {t("AI SQUAD COMMENTARY")}
           </button>
 
           <button
@@ -678,17 +680,17 @@ export default function PitchBuilder({
             className="w-full py-3 rounded-xl bg-slate-800 border border-white/10 text-white hover:text-yellow-400 select-none font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] transition cursor-pointer disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
-            LOCK SQUAD IN DB
+            {t("LOCK SQUAD IN DB")}
           </button>
 
           <button
             onClick={() => { playFutSound('success'); setShowShareModal(true); }}
             disabled={slots.filter(s => s.player !== null).length === 0}
             className="w-full py-3.5 rounded-xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-500 text-white font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition cursor-pointer disabled:opacity-50 shadow-[0_0_20px_rgba(219,39,119,0.3)]"
-            title="Export a beautiful Instagram story layout to screenshot and share!"
+            title={t("Export a beautiful Instagram story layout to screenshot and share!")}
           >
             <Camera className="w-4 h-4" />
-            📸 VIRAL STORY EXPORT
+            📸 {t("VIRAL STORY EXPORT")}
           </button>
         </div>
       </div>

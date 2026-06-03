@@ -115,8 +115,8 @@ export function useAuth() {
           createdAt: joinDate
         });
       }
-    } catch (e) {
-      console.error('Error in fetchProfile cycle:', e);
+    } catch (e: any) {
+      console.warn('Error in fetchProfile cycle:', e?.message || e);
     }
   };
 
@@ -146,8 +146,8 @@ export function useAuth() {
         } else {
           setProfile(null);
         }
-      } catch (err) {
-        console.error('Error during initAuth setup:', err);
+      } catch (err: any) {
+        console.warn('Error during initAuth setup:', err?.message || err);
       } finally {
         if (active) {
           setLoading(false);

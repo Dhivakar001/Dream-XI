@@ -4,6 +4,7 @@ import { Squad } from '../types';
 import { playFutSound } from '../utils';
 import { deleteSquadFromCloud } from '../lib/supabaseDb';
 import { Trash2, Edit, Eye, Trophy, Sparkles, ChevronRight, Share2, Layers } from 'lucide-react';
+import { useTranslation } from '../lib/LanguageContext';
 
 interface MySquadsViewProps {
   userId: string;
@@ -22,6 +23,7 @@ export default function MySquadsView({
   onGoToBuilder,
   id,
 }: MySquadsViewProps) {
+  const { t } = useTranslation();
   const [selectedPreviewSquad, setSelectedPreviewSquad] = useState<Squad | null>(null);
 
   // Filter only squads belonging to the logged-in user
@@ -33,10 +35,10 @@ export default function MySquadsView({
       <div className="flex justify-between items-center mb-8 bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-md">
         <div>
           <h2 className="text-base font-black text-white uppercase flex items-center gap-2">
-            <Layers className="w-5 h-5 text-purple-400" /> My Tactical Locker Room
+            <Layers className="w-5 h-5 text-purple-400" /> {t("My Tactical Locker Room")}
           </h2>
           <p className="text-[9px] text-gray-400 uppercase mt-1 tracking-widest">
-            PERSISTENT CLOUD COACH ARCHIVES • {mySquads.length} SQUADS DRAFTED
+            {t("PERSISTENT CLOUD COACH ARCHIVES")} • {mySquads.length} {t("SQUADS DRAFTED")}
           </p>
         </div>
         
@@ -45,7 +47,7 @@ export default function MySquadsView({
             onClick={onGoToBuilder}
             className="px-4 py-2 bg-purple-500 hover:bg-purple-400 text-white font-sans font-black text-[10px] uppercase rounded-xl transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(168,85,247,0.3)] cursor-pointer"
           >
-            + Draft New XI
+            {t("+ Draft New XI")}
           </button>
         )}
       </div>
@@ -56,15 +58,15 @@ export default function MySquadsView({
           <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-3xl mb-4 font-sans">
             📂
           </div>
-          <h3 className="font-sans font-black text-white text-sm uppercase">Locker Room Empty</h3>
+          <h3 className="font-sans font-black text-white text-sm uppercase">{t("Locker Room Empty")}</h3>
           <p className="text-gray-400 text-[10px] mt-2 uppercase tracking-wide max-w-xs leading-relaxed">
-            You haven't locked in any tactical lineups yet. Get over to the Tactical Pitch and formulate your first masterpiece!
+            {t("You haven't locked in any tactical lineups yet. Get over to the Tactical Pitch and formulate your first masterpiece!")}
           </p>
           <button
             onClick={onGoToBuilder}
             className="mt-6 px-6 py-3 bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-sans font-black text-[10px] uppercase rounded-xl hover:scale-105 transition cursor-pointer"
           >
-            📋 Head to Builder
+            📋 {t("Head to Builder")}
           </button>
         </div>
       ) : (
@@ -91,9 +93,9 @@ export default function MySquadsView({
                       </p>
                     )}
                     <div className="flex flex-wrap gap-x-4 gap-y-1.5 pt-2 font-mono text-[9px] uppercase tracking-widest text-gray-400">
-                      <span>RATING: <strong className="text-yellow-400">{sq.rating} OVR</strong></span>
-                      <span>CHEMISTRY: <strong className="text-[#10b981]">{sq.chemistry}%</strong></span>
-                      <span>COOKED: <strong className="text-purple-400">{activeCount}/11 STARS</strong></span>
+                      <span>{t("RATING:")} <strong className="text-yellow-400">{sq.rating} {t("OVR")}</strong></span>
+                      <span>{t("CHEMISTRY:")} <strong className="text-[#10b981]">{sq.chemistry}%</strong></span>
+                      <span>{t("COOKED:")} <strong className="text-purple-400">{activeCount}/11 {t("STARS")}</strong></span>
                     </div>
                   </div>
 
@@ -105,9 +107,9 @@ export default function MySquadsView({
                         setSelectedPreviewSquad(sq);
                       }}
                       className="p-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 hover:text-cyan-400 border border-white/5 transition flex items-center gap-1.5 text-[9px] uppercase tracking-wider font-extrabold cursor-pointer text-gray-300"
-                      title="Quick Preview Squad"
+                      title={t("Preview")}
                     >
-                      <Eye className="w-3.5 h-3.5" /> Preview
+                      <Eye className="w-3.5 h-3.5" /> {t("Preview")}
                     </button>
                     
                     <button
@@ -116,14 +118,14 @@ export default function MySquadsView({
                         onLoadSquad(sq);
                       }}
                       className="p-2 px-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 border border-purple-500/20 transition flex items-center gap-1.5 text-[9px] uppercase tracking-wider font-extrabold cursor-pointer"
-                      title="Load into Active Tactical Pitch"
+                      title={t("Edit")}
                     >
-                      <Edit className="w-3.5 h-3.5" /> Edit
+                      <Edit className="w-3.5 h-3.5" /> {t("Edit")}
                     </button>
 
                     <button
                       onClick={async () => {
-                        if (!confirm(`Confirm benching squad: '${sq.name}' permanent-wise?`)) return;
+                        if (!confirm(t("Confirm benching squad: '{name}' permanent-wise?").replace("{name}", sq.name))) return;
                         playFutSound('click');
                         const ok = await deleteSquadFromCloud(sq.id);
                         try {
@@ -135,9 +137,9 @@ export default function MySquadsView({
                         }
                       }}
                       className="p-2 px-3 rounded-xl bg-red-950/40 hover:bg-red-900/40 text-red-400 border border-red-500/10 transition flex items-center gap-1.5 text-[9px] uppercase tracking-wider font-extrabold cursor-pointer"
-                      title="Bench and Scrap Squad"
+                      title={t("Bench")}
                     >
-                      <Trash2 className="w-3.5 h-3.5" /> Bench
+                      <Trash2 className="w-3.5 h-3.5" /> {t("Bench")}
                     </button>
                   </div>
                 </div>
@@ -155,20 +157,20 @@ export default function MySquadsView({
               {/* Backing stadium layout */}
               <div className="flex justify-between items-center border-b border-white/5 pb-3">
                 <span className="text-[10px] text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                  <Trophy className="w-4 h-4 text-yellow-400" /> SQUAD SPECIFICATIONS
+                  <Trophy className="w-4 h-4 text-yellow-400" /> {t("SQUAD SPECIFICATIONS")}
                 </span>
                 <button
                   onClick={() => setSelectedPreviewSquad(null)}
                   className="text-gray-400 hover:text-white font-black text-xs uppercase"
                 >
-                  Close
+                  {t("Close")}
                 </button>
               </div>
 
               <div>
                 <h3 className="font-sans font-black text-white text-base uppercase leading-none">{selectedPreviewSquad.name}</h3>
                 <span className="text-[9px] text-[#10b981] uppercase font-bold mt-2 inline-block">
-                  AURA RATING: ⭐ {selectedPreviewSquad.auraScore} pts
+                  {t("AURA RATING:")} ⭐ {selectedPreviewSquad.auraScore} pts
                 </span>
                 {selectedPreviewSquad.description && (
                   <p className="text-gray-400 text-[11px] font-sans italic mt-2.5 bg-black/40 p-2.5 rounded-lg border border-white/5">
@@ -179,7 +181,7 @@ export default function MySquadsView({
 
               {/* Player lineup summary list */}
               <div className="flex flex-col gap-2">
-                <span className="text-[8px] text-gray-500 uppercase tracking-widest block mb-1">Squad Starter XI Positions</span>
+                <span className="text-[8px] text-gray-500 uppercase tracking-widest block mb-1">{t("Squad Starter XI Positions")}</span>
                 <div className="flex flex-col gap-1.5 max-h-[250px] overflow-y-auto pr-1">
                   {selectedPreviewSquad.slots.map((sl, index) => (
                     <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-black/40 border border-white/5">
@@ -189,10 +191,10 @@ export default function MySquadsView({
                           <span className="font-bold truncate max-w-[140px] uppercase flex items-center gap-1">
                             <span>{sl.player.nationFlag}</span> {sl.player.name}
                           </span>
-                          <span className="font-mono text-[10px] text-yellow-400 font-black">{sl.player.rating} OVR</span>
+                          <span className="font-mono text-[10px] text-yellow-400 font-black">{sl.player.rating} {t("OVR")}</span>
                         </div>
                       ) : (
-                        <span className="flex-1 text-gray-600 uppercase text-[9px] tracking-wider italic">VANCANT slot</span>
+                        <span className="flex-1 text-gray-600 uppercase text-[9px] tracking-wider italic">{t("VANCANT slot")}</span>
                       )}
                     </div>
                   ))}
@@ -207,7 +209,7 @@ export default function MySquadsView({
                 }}
                 className="w-full py-3 bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-sans font-black uppercase text-center rounded-xl tracking-wider hover:scale-105 transition cursor-pointer"
               >
-                📋 Load Into Tactical Pitch
+                📋 {t("📋 Load Into Tactical Pitch")}
               </button>
             </motion.div>
           )}

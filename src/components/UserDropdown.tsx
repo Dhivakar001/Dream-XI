@@ -4,6 +4,7 @@ import { User, Layers, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { UserProfile } from '../types';
 import UserAvatar from './UserAvatar';
 import { playFutSound } from '../utils';
+import { useTranslation } from '../lib/LanguageContext';
 
 interface UserDropdownProps {
   profile: UserProfile | null;
@@ -18,6 +19,7 @@ export default function UserDropdown({
   onLogout,
   id,
 }: UserDropdownProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -56,7 +58,7 @@ export default function UserDropdown({
             {profile.username}
           </p>
           <span className="text-[8px] text-gray-400 tracking-widest block uppercase">
-            GAFFER XI
+            {t("GAFFER XI")}
           </span>
         </div>
         <ChevronDown className={`w-3.5 h-3.5 text-gray-400 group-hover:text-emerald-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
@@ -74,7 +76,7 @@ export default function UserDropdown({
           >
             {/* Quick Profile Summary Header */}
             <div className="p-4 border-b border-white/5 bg-white/[0.02]">
-              <p className="text-[9px] text-gray-500 uppercase tracking-widest leading-none">Logged In As</p>
+              <p className="text-[9px] text-gray-500 uppercase tracking-widest leading-none">{t("Logged In As")}</p>
               <p className="font-sans font-black text-white text-sm uppercase mt-1.5 truncate">
                 {profile.username}
               </p>
@@ -95,7 +97,7 @@ export default function UserDropdown({
                 id="menu-item-profile"
               >
                 <User className="w-4 h-4" />
-                <span className="font-sans font-bold">My Profile</span>
+                <span className="font-sans font-bold">{t("My Profile")}</span>
               </button>
 
               <button
@@ -108,7 +110,7 @@ export default function UserDropdown({
                 id="menu-item-squads"
               >
                 <Layers className="w-4 h-4" />
-                <span className="font-sans font-bold">My Squads</span>
+                <span className="font-sans font-bold">{t("My Squads")}</span>
               </button>
 
               <button
@@ -121,7 +123,7 @@ export default function UserDropdown({
                 id="menu-item-settings"
               >
                 <Settings className="w-4 h-4" />
-                <span className="font-sans font-bold">Settings</span>
+                <span className="font-sans font-bold">{t("Settings")}</span>
               </button>
             </div>
 
@@ -136,7 +138,7 @@ export default function UserDropdown({
                 id="menu-item-logout"
               >
                 <LogOut className="w-4 h-4" />
-                <span className="font-sans font-bold">Logout</span>
+                <span className="font-sans font-bold">{t("Logout")}</span>
               </button>
             </div>
           </motion.div>
