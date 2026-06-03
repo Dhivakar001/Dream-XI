@@ -96,7 +96,48 @@ export function calculateSquadAura(slots: SquadSlot[]): number {
   return Math.round((sum / active.length) * 10) / 10;
 }
 
+// Precise mobile haptic engine helper leveraging the Navigator Vibrate API
+export function vibrateDevice(pattern: number | number[]) {
+  if (typeof window !== 'undefined' && typeof window.navigator !== 'undefined' && typeof window.navigator.vibrate === 'function') {
+    try {
+      window.navigator.vibrate(pattern);
+    } catch (e) {
+      // Ignored gracefully: some browsers/devices restrict auto-vibrations without user interaction
+    }
+  }
+}
+
 // UI Tone synthesizers using Web Audio API so it runs offline and is highly interactive
 export function playFutSound(type: 'click' | 'success' | 'stadium' | 'hover' | 'whistle' | 'kickoff' | 'fulltime') {
   // Silent fallback to provide a cleaner and distraction-free user experience
+  
+  // Tactical TikTok-like dynamic haptic feedback mapping based on sound/interaction events
+  switch (type) {
+    case 'click':
+      // Extremely subtle tactile snap (9ms) - perfect for tab navigation and selection clicks
+      vibrateDevice(9);
+      break;
+    case 'success':
+      // Satisfying dual tactile pulse feedback (15ms tick, 40ms wait, 12ms tick) for completing/saving builds
+      vibrateDevice([15, 40, 12]);
+      break;
+    case 'whistle':
+      // Simulated physical whistle whistle rumble
+      vibrateDevice([35, 25, 40]);
+      break;
+    case 'kickoff':
+      // Solid kickoff blast (40ms) when match starts
+      vibrateDevice(40);
+      break;
+    case 'fulltime':
+      // Multiple whistle sweeps to denote ending (50ms tap, 30ms gap, 50ms tap, 30ms gap, 100ms finish)
+      vibrateDevice([50, 30, 50, 30, 100]);
+      break;
+    case 'hover':
+      // Almost imperceptible touch tick for slider changes or item hovers
+      vibrateDevice(5);
+      break;
+    default:
+      break;
+  }
 }
