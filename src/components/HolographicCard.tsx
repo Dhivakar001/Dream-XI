@@ -145,31 +145,31 @@ export default function HolographicCard({
 
   // Sizing definitions
   const dimensions = {
-    sm: 'w-[145px] h-[220px] text-[10px]',
+    sm: 'w-[90px] h-[138px] min-[370px]:w-[110px] min-[370px]:h-[168px] sm:w-[145px] sm:h-[220px] text-[8px] sm:text-[10px]',
     md: 'w-[205px] h-[310px] text-xs',
     lg: 'w-[275px] h-[415px] text-sm',
   };
 
   const avatarSizes = {
-    sm: 'w-14 h-14 mb-1 rounded-xl shrink-0',
+    sm: 'w-10 h-10 min-[370px]:w-11 min-[370px]:h-11 sm:w-14 sm:h-14 mb-0.5 sm:mb-1 rounded-lg sm:rounded-xl shrink-0',
     md: 'w-24 h-24 mb-1.5 rounded-2xl shrink-0',
     lg: 'w-32 h-32 mb-2 rounded-2xl shrink-0',
   };
 
   const imageSizes = {
-    sm: 'w-10 h-10 mt-1',
+    sm: 'w-7 h-7 min-[370px]:w-8 min-[370px]:h-8 sm:w-10 sm:h-10 mt-0.5 sm:mt-1',
     md: 'w-20 h-20 mt-2',
     lg: 'w-28 h-28 mt-2.5',
   };
 
   const fontSizes = {
-    sm: 'text-xs',
+    sm: 'text-[8px] min-[370px]:text-[9px] sm:text-xs',
     md: 'text-sm',
     lg: 'text-base font-black',
   };
 
   const ratingSizes = {
-    sm: player.rating >= 97 ? 'text-xl' : 'text-lg',
+    sm: player.rating >= 97 ? 'text-xs min-[370px]:text-sm sm:text-xl' : 'text-[10px] min-[370px]:text-[11px] sm:text-lg',
     md: player.rating >= 97 ? 'text-3.5xl' : 'text-3xl font-black',
     lg: player.rating >= 97 ? 'text-5xl' : 'text-4xl font-black',
   };
@@ -187,7 +187,7 @@ export default function HolographicCard({
   };
 
   const badgeSizes = {
-    sm: 'px-1 py-0.2 text-[6px] rotate-[-2deg] scale-90',
+    sm: 'px-0.5 py-0.1 text-[5px] select-none scale-90 sm:px-1 sm:py-0.2 sm:text-[6px] rotate-[-2deg] sm:scale-90',
     md: 'px-2 py-0.5 text-[8px] rotate-[-4deg] scale-95',
     lg: 'px-2.5 py-1 text-[10px] rotate-[-4deg]',
   };
@@ -232,35 +232,35 @@ export default function HolographicCard({
 
       {/* Header Slot: Position & Nation details */}
       <div className="w-full flex justify-between items-start mb-1 select-none z-10">
-        <div className="flex flex-col items-stretch text-center gap-1">
+        <div className="flex flex-col items-stretch text-center gap-0.5 sm:gap-1">
           <span className={`tracking-tighter ${card.ratingText} leading-none select-none ${ratingSizes[size]}`}>
             {player.rating}
           </span>
-          <span className="font-extrabold text-[9px] uppercase text-[#FBE116] select-none tracking-widest leading-none">
+          <span className="font-extrabold text-[7px] sm:text-[9px] uppercase text-[#FBE116] select-none tracking-wider sm:tracking-widest leading-none">
             {player.position}
           </span>
           
           {/* Nation Abbrev Capsule Tag */}
-          <div className="flex items-center justify-center gap-0.5 bg-black/85 border border-white/20 text-[#FBE116] text-[7.5px] font-mono font-black rounded px-1.5 py-0.5 mt-1 tracking-wider leading-none shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
-            <Globe className="w-2 h-2 text-sky-400 animate-spin-slow shrink-0" />
+          <div className="flex items-center justify-center gap-0.5 bg-black/85 border border-white/20 text-[#FBE116] text-[5.5px] sm:text-[7.5px] font-mono font-black rounded px-1 sm:px-1.5 py-0.2 sm:py-0.5 mt-0.5 sm:mt-1 tracking-wider leading-none shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
+            <Globe className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-sky-400 animate-spin-slow shrink-0" />
             <span>{getCountryAbbrev(player.nation)}</span>
           </div>
 
           {/* Club Initial Label Tag */}
-          <div className="flex items-center justify-center gap-0.5 bg-[#0B0B0F] border border-[#009E49]/55 text-white text-[7px] font-sans font-black rounded-md px-1 py-0.5 leading-none shadow-[0_1.5px_3px_rgba(0,0,0,0.6)]">
-            <Shield className="w-1.5 h-1.5 text-emerald-500 shrink-0" />
+          <div className="flex items-center justify-center gap-0.5 bg-[#0B0B0F] border border-[#009E49]/55 text-white text-[5.5px] sm:text-[7px] font-sans font-black rounded sm:rounded-md px-0.5 sm:px-1 py-0.2 sm:py-0.5 leading-none shadow-[0_1.5px_3px_rgba(0,0,0,0.6)]">
+            <Shield className="w-1 h-1 sm:w-1.5 sm:h-1.5 text-emerald-500 shrink-0" />
             <span>{getClubAbbrev(player.club)}</span>
           </div>
         </div>
         
         {/* Playstyle Tag / Street Stamp Badge */}
-        <div className={`border-2 rounded-lg uppercase tracking-tighter font-extrabold font-mono select-none flex items-center gap-1 ${card.badge} ${badgeSizes[size]}`}>
-          {card.badgeType === 'goat' && <Award className="w-2.5 h-2.5 text-[#FBE116] animate-pulse" />}
-          {card.badgeType === 'toty' && <Flame className="w-2.5 h-2.5 text-orange-400 animate-bounce" />}
-          {card.badgeType === 'legend' && <Trophy className="w-2.5 h-2.5 text-yellow-500 animate-bounce" />}
-          {card.badgeType === 'icon' && <Zap className="w-2.5 h-2.5 text-cyan-400 animate-pulse" />}
-          {card.badgeType === 'future' && <TrendingUp className="w-2.5 h-2.5 text-pink-500 animate-bounce" />}
-          {card.badgeType === 'gold' && <Shield className="w-2.5 h-2.5 text-emerald-400" />}
+        <div className={`hidden min-[370px]:flex border-2 rounded-lg uppercase tracking-tighter font-extrabold font-mono select-none items-center gap-1 ${card.badge} ${badgeSizes[size]}`}>
+          {card.badgeType === 'goat' && <Award className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-[#FBE116] animate-pulse" />}
+          {card.badgeType === 'toty' && <Flame className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-orange-400 animate-bounce" />}
+          {card.badgeType === 'legend' && <Trophy className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-yellow-500 animate-bounce" />}
+          {card.badgeType === 'icon' && <Zap className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-cyan-400 animate-pulse" />}
+          {card.badgeType === 'future' && <TrendingUp className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-pink-500 animate-bounce" />}
+          {card.badgeType === 'gold' && <Shield className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-emerald-400" />}
           <span>{t(card.label)}</span>
         </div>
       </div>
@@ -277,18 +277,18 @@ export default function HolographicCard({
           referrerPolicy="no-referrer"
         />
         
-        <div className="absolute bottom-0 w-full text-center py-0.5 bg-black/80 border-t border-white/5 text-[7px] text-[#FBE116] font-graffiti select-none tracking-widest uppercase z-10 truncate px-1">
+        <div className="absolute bottom-0 w-full text-center py-0.5 bg-black/80 border-t border-white/5 text-[5px] sm:text-[7px] text-[#FBE116] font-graffiti select-none tracking-normal sm:tracking-widest uppercase z-10 truncate px-1">
           {player.playstyle}
         </div>
       </div>
 
       {/* Name Display */}
-      <div className={`w-full text-center ${size === 'sm' ? 'mb-1' : 'mb-2.5'} select-none z-10`}>
-        <h3 className={`font-black tracking-tighter text-white uppercase truncate flex items-center justify-center gap-1 ${fontSizes[size]}`}>
+      <div className={`w-full text-center ${size === 'sm' ? 'mb-0.5' : 'mb-2.5'} select-none z-10`}>
+        <h3 className={`font-black tracking-tighter text-white uppercase truncate flex items-center justify-center gap-0.5 sm:gap-1 ${fontSizes[size]}`}>
           {player.name}
-          {player.rating >= 96 && <Star className={`${size === 'sm' ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5'} fill-[#FBE116] text-[#FBE116] inline`} />}
+          {player.rating >= 96 && <Star className={`${size === 'sm' ? 'w-2 h-2 sm:w-3.5 sm:h-3.5' : 'w-3.5 h-3.5'} fill-[#FBE116] text-[#FBE116] inline`} />}
         </h3>
-        <p className={`${size === 'sm' ? 'text-[8.5px]' : 'text-[10px]'} text-gray-400 font-mono tracking-wide truncate`}>
+        <p className={`${size === 'sm' ? 'text-[6.5px] min-[370px]:text-[7.5px] sm:text-[10px]' : 'text-[10px]'} text-gray-400 font-mono tracking-wide truncate`}>
           {player.club} • {player.league}
         </p>
       </div>
@@ -336,18 +336,18 @@ export default function HolographicCard({
       )}
 
       {/* Aura Rating Bottom Meter */}
-      <div className="w-full mt-auto select-none z-10">
-        <div className="flex justify-between items-center text-[9px] text-[#009E49] font-mono mb-1 select-none">
-          <span className="flex items-center gap-1 font-black tracking-wide">
-            {t("⚡ AURA INDEX:")}
+      <div className="w-full mt-auto select-none z-10 font-mono">
+        <div className="flex justify-between items-center text-[7px] sm:text-[9px] text-[#009E49] mb-1 select-none">
+          <span className="flex items-center gap-0.5 sm:gap-1 font-black tracking-normal sm:tracking-wide">
+            {size === 'sm' ? t("⚡ AURA") : t("⚡ AURA INDEX:")}
           </span>
           <span className="font-extrabold text-[#FBE116] tracking-widest text-right select-none">
             {player.auraRating}%
           </span>
         </div>
-        <div className="w-full bg-slate-900/90 rounded-full h-1.5 overflow-hidden select-none border border-white/5">
+        <div className="w-full bg-slate-900/90 rounded-full h-1 sm:h-1.5 overflow-hidden select-none border border-white/5">
           <div
-            className="bg-gradient-to-r from-[#009E49] via-[#FBE116] to-[#00efff] h-1.5 rounded-full filter drop-shadow-[0_0_4px_#FBE116]"
+            className="bg-gradient-to-r from-[#009E49] via-[#FBE116] to-[#00efff] h-1 sm:h-1.5 rounded-full filter drop-shadow-[0_0_4px_#FBE116]"
             style={{ width: `${Math.min(100, player.auraRating)}%` }}
           />
         </div>

@@ -484,7 +484,7 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen custom-grid-bg text-slate-100 flex flex-col font-sans select-none antialiased relative pb-20 sm:pb-8">
+    <div className="min-h-screen custom-grid-bg text-slate-100 flex flex-col font-sans select-none antialiased relative pb-20 sm:pb-8 overflow-x-hidden max-w-full w-full">
       
       {/* Spraypaint paint splash overlays */}
       <div className="spray-overlay" />
@@ -757,7 +757,7 @@ export default function App() {
       </nav>
 
       {/* 4. Main content body renderers with smooth view fade-in */}
-      <main className="flex-1 max-w-7xl mx-auto w-full py-6 px-4">
+      <main className="flex-1 max-w-7xl mx-auto w-full py-6 px-4 overflow-x-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

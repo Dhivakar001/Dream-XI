@@ -471,117 +471,119 @@ export default function PitchBuilder({
         </div>
 
         {/* Dynamic Stadium Soccer Pitch */}
-        <div className="w-full max-w-3xl bg-radial from-[#10301a] via-[#06120b] to-[#040407] aspect-[3/4] relative rounded-3xl overflow-hidden border-[3px] border-black shadow-[10px_10px_0px_#FBE116] select-none">
-          {/* Street Yard Pavement Decal lines */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(251,225,22,0.015)_2px,transparent_2px),linear-gradient(90deg,rgba(0,158,73,0.015)_2px,transparent_2px)] bg-[size:32px_32px] pointer-events-none opacity-30" />
+        <div className="w-full overflow-x-auto pb-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-emerald-500/10 flex justify-center">
+          <div className="min-w-[440px] sm:min-w-0 w-full max-w-3xl bg-radial from-[#10301a] via-[#06120b] to-[#040407] aspect-[3/4] relative rounded-3xl overflow-hidden border-[3px] border-black shadow-[10px_10px_0px_#FBE116] select-none">
+            {/* Street Yard Pavement Decal lines */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(251,225,22,0.015)_2px,transparent_2px),linear-gradient(90deg,rgba(0,158,73,0.015)_2px,transparent_2px)] bg-[size:32px_32px] pointer-events-none opacity-30" />
 
-          {/* Classic Modern Center Backdrop sticker stamp */}
-          <div className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-graffiti text-[#FBE116]/8 select-none pointer-events-none text-2xl sm:text-5xl uppercase rotate-[-8deg] tracking-[0.2em] select-none">
-            🏆 WORLD ARENA • STREET XI
-          </div>
-
-          {/* Cyber Stadium Spotlight Beams */}
-          <div className="absolute top-0 left-0 w-32 h-32 bg-radial from-[#FBE116]/25 to-transparent filter blur-xl animate-pulse pointer-events-none" />
-          <div className="absolute top-0 right-0 w-32 h-32 bg-radial from-[#009E49]/25 to-transparent filter blur-xl animate-pulse pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-40 h-40 bg-radial from-[#002776]/25 to-transparent filter blur-2xl pointer-events-none" />
-          <div className="absolute bottom-0 right-0 w-40 h-40 bg-[#009E49]/10 filter blur-2xl pointer-events-none" />
-          
-          {/* Corner Light beams - Golden stadium floodlights */}
-          <div className="absolute -top-[20%] -left-[20%] w-[80%] h-[80%] bg-gradient-to-br from-white/11 via-[#FBE116]/8 to-transparent rotate-45 transform origin-top-left pointer-events-none mix-blend-screen" />
-          <div className="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] bg-gradient-to-bl from-white/11 via-[#009E49]/8 to-transparent -rotate-45 transform origin-top-right pointer-events-none mix-blend-screen" />
-
-          {/* Pitch Lines (glowing yellow/green style) */}
-          <div className="absolute inset-0 p-4 pointer-events-none select-none">
-            <div className="w-full h-full border-2 border-[#009E49]/30 rounded-2xl relative select-none">
-              {/* Midfield line index */}
-              <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-[#FBE116]/30 to-transparent absolute top-1/2 left-0 select-none text-transparent" />
-              <div className="w-32 h-32 border-2 border-[#FBE116]/30 rounded-full absolute top-1/2 left-1/2 -ml-16 -mt-16 select-none" />
-              <div className="w-4 h-4 rounded-full bg-[#FBE116]/40 absolute top-1/2 left-1/2 -ml-2 -mt-2 animate-ping select-none" />
-              <div className="w-3 h-3 rounded-full bg-[#009E49]/60 absolute top-1/2 left-1/2 -ml-1.5 -mt-1.5 select-none" />
-              
-              {/* Penalty Boxes */}
-              {/* Goal top */}
-              <div className="w-52 h-24 border-2 border-[#009E49]/30 absolute top-0 left-1/2 -ml-26 rounded-b backdrop-blur-[1px] select-none" />
-              <div className="w-24 h-10 border-2 border-[#FBE116]/20 absolute top-0 left-1/2 -ml-12 rounded-b select-none" />
-              {/* Goal bottom */}
-              <div className="w-52 h-24 border-2 border-[#009E49]/30 absolute bottom-0 left-1/2 -ml-26 rounded-t backdrop-blur-[1px] select-none" />
-              <div className="w-24 h-10 border-2 border-[#FBE116]/20 absolute bottom-0 left-1/2 -ml-12 rounded-t select-none" />
+            {/* Classic Modern Center Backdrop sticker stamp */}
+            <div className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-graffiti text-[#FBE116]/8 select-none pointer-events-none text-2xl sm:text-5xl uppercase rotate-[-8deg] tracking-[0.2em] select-none">
+              🏆 WORLD ARENA • STREET XI
             </div>
-          </div>
 
-          {/* SVG Animated Chemistry Links Canvas - Now matches high impact green/yellow chemistry laser beams */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-            {getPitchConnections().map(conn => (
-              <line
-                key={conn.id}
-                x1={`${conn.x1}%`}
-                y1={`${conn.y1}%`}
-                x2={`${conn.x2}%`}
-                y2={`${conn.y2}%`}
-                stroke={conn.hasPlayer ? '#FBE116' : 'rgba(255, 255, 255, 0.05)'}
-                strokeWidth={conn.hasPlayer ? '4' : '1.5'}
-                strokeDasharray={conn.hasPlayer ? '8,4' : 'none'}
-                className={conn.hasPlayer ? 'animate-[dash_8s_linear_infinite] filter drop-shadow-[0_0_8px_#FBE116]' : ''}
-              />
-            ))}
-          </svg>
+            {/* Cyber Stadium Spotlight Beams */}
+            <div className="absolute top-0 left-0 w-32 h-32 bg-radial from-[#FBE116]/25 to-transparent filter blur-xl animate-pulse pointer-events-none" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-radial from-[#009E49]/25 to-transparent filter blur-xl animate-pulse pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-radial from-[#002776]/25 to-transparent filter blur-2xl pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-40 h-40 bg-[#009E49]/10 filter blur-2xl pointer-events-none" />
+            
+            {/* Corner Light beams - Golden stadium floodlights */}
+            <div className="absolute -top-[20%] -left-[20%] w-[80%] h-[80%] bg-gradient-to-br from-white/11 via-[#FBE116]/8 to-transparent rotate-45 transform origin-top-left pointer-events-none mix-blend-screen" />
+            <div className="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] bg-gradient-to-bl from-white/11 via-[#009E49]/8 to-transparent -rotate-45 transform origin-top-right pointer-events-none mix-blend-screen" />
 
-          {/* Dynamic Active Slots on Soccer Pitch */}
-          {slots.map(slot => {
-            const posDetails = FORMATIONS[formationName].positions.find(pos => pos.id === slot.positionId);
-            if (!posDetails) return null;
-
-            const isOccupied = slot.player !== null;
-
-            return (
-              <div
-                key={slot.positionId}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-500 bg-transparent"
-                style={{
-                  left: `${posDetails.x}%`,
-                  top: `${posDetails.y}%`,
-                  zIndex: isOccupied ? 10 : 5
-                }}
-              >
-                {isOccupied ? (
-                  /* Mini Card display or Hover preview on pitch slot */
-                  <div className="relative group flex flex-col items-center">
-                    <HolographicCard
-                      player={slot.player!}
-                      size="sm"
-                      onClick={() => openSlotSelector(slot.positionId)}
-                      showStats={false}
-                    />
-                    {/* Delete handle */}
-                    <button
-                      onClick={(e) => removePlayerFromSlot(slot.positionId, e)}
-                      className="absolute -top-1.5 -right-1.5 bg-black/90 text-red-400 hover:text-red-300 border border-white/10 rounded-full p-1 shadow-lg cursor-pointer transform hover:scale-110 opacity-0 group-hover:opacity-100 transition z-20"
-                      title="Bench Player"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                    {/* Compact label overlay */}
-                    <span className="mt-1 bg-slate-900/95 border border-white/10 text-[9px] font-black px-1.5 py-0.5 rounded leading-none text-yellow-400 select-none uppercase shadow-md">
-                      {posDetails.label}
-                    </span>
-                  </div>
-                ) : (
-                  /* Empty Slot Indicator with glowing neon border */
-                  <button
-                    onClick={() => openSlotSelector(slot.positionId)}
-                    className="w-14 h-20 border-2 border-dashed border-emerald-500/20 hover:border-emerald-400 bg-emerald-950/20 rounded-xl flex flex-col items-center justify-center p-2 cursor-pointer transition duration-300 hover:scale-105 group"
-                  >
-                    <span className="text-[10px] font-black text-emerald-400 group-hover:text-emerald-300 tracking-tighter select-none">
-                      {posDetails.label}
-                    </span>
-                    <span className="text-[20px] font-bold text-emerald-500/50 group-hover:text-emerald-300 leading-none mt-1 select-none">
-                      +
-                    </span>
-                  </button>
-                )}
+            {/* Pitch Lines (glowing yellow/green style) */}
+            <div className="absolute inset-0 p-4 pointer-events-none select-none">
+              <div className="w-full h-full border-2 border-[#009E49]/30 rounded-2xl relative select-none">
+                {/* Midfield line index */}
+                <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-[#FBE116]/30 to-transparent absolute top-1/2 left-0 select-none text-transparent" />
+                <div className="w-32 h-32 border-2 border-[#FBE116]/30 rounded-full absolute top-1/2 left-1/2 -ml-16 -mt-16 select-none" />
+                <div className="w-4 h-4 rounded-full bg-[#FBE116]/40 absolute top-1/2 left-1/2 -ml-2 -mt-2 animate-ping select-none" />
+                <div className="w-3 h-3 rounded-full bg-[#009E49]/60 absolute top-1/2 left-1/2 -ml-1.5 -mt-1.5 select-none" />
+                
+                {/* Penalty Boxes */}
+                {/* Goal top */}
+                <div className="w-52 h-24 border-2 border-[#009E49]/30 absolute top-0 left-1/2 -ml-26 rounded-b backdrop-blur-[1px] select-none" />
+                <div className="w-24 h-10 border-2 border-[#FBE116]/20 absolute top-0 left-1/2 -ml-12 rounded-b select-none" />
+                {/* Goal bottom */}
+                <div className="w-52 h-24 border-2 border-[#009E49]/30 absolute bottom-0 left-1/2 -ml-26 rounded-t backdrop-blur-[1px] select-none" />
+                <div className="w-24 h-10 border-2 border-[#FBE116]/20 absolute bottom-0 left-1/2 -ml-12 rounded-t select-none" />
               </div>
-            );
-          })}
+            </div>
+
+            {/* SVG Animated Chemistry Links Canvas - Now matches high impact green/yellow chemistry laser beams */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+              {getPitchConnections().map(conn => (
+                <line
+                  key={conn.id}
+                  x1={`${conn.x1}%`}
+                  y1={`${conn.y1}%`}
+                  x2={`${conn.x2}%`}
+                  y2={`${conn.y2}%`}
+                  stroke={conn.hasPlayer ? '#FBE116' : 'rgba(255, 255, 255, 0.05)'}
+                  strokeWidth={conn.hasPlayer ? '4' : '1.5'}
+                  strokeDasharray={conn.hasPlayer ? '8,4' : 'none'}
+                  className={conn.hasPlayer ? 'animate-[dash_8s_linear_infinite] filter drop-shadow-[0_0_8px_#FBE116]' : ''}
+                />
+              ))}
+            </svg>
+
+            {/* Dynamic Active Slots on Soccer Pitch */}
+            {slots.map(slot => {
+              const posDetails = FORMATIONS[formationName].positions.find(pos => pos.id === slot.positionId);
+              if (!posDetails) return null;
+
+              const isOccupied = slot.player !== null;
+
+              return (
+                <div
+                  key={slot.positionId}
+                  className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-500 bg-transparent"
+                  style={{
+                    left: `${posDetails.x}%`,
+                    top: `${posDetails.y}%`,
+                    zIndex: isOccupied ? 10 : 5
+                  }}
+                >
+                  {isOccupied ? (
+                    /* Mini Card display or Hover preview on pitch slot */
+                    <div className="relative group flex flex-col items-center">
+                      <HolographicCard
+                        player={slot.player!}
+                        size="sm"
+                        onClick={() => openSlotSelector(slot.positionId)}
+                        showStats={false}
+                      />
+                      {/* Delete handle */}
+                      <button
+                        onClick={(e) => removePlayerFromSlot(slot.positionId, e)}
+                        className="absolute -top-1.5 -right-1.5 bg-black/90 text-red-400 hover:text-red-300 border border-white/10 rounded-full p-1 shadow-lg cursor-pointer transform hover:scale-110 opacity-0 group-hover:opacity-100 transition z-20"
+                        title="Bench Player"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                      {/* Compact label overlay */}
+                      <span className="mt-1 bg-slate-900/95 border border-white/10 text-[9px] font-black px-1.5 py-0.5 rounded leading-none text-yellow-400 select-none uppercase shadow-md">
+                        {posDetails.label}
+                      </span>
+                    </div>
+                  ) : (
+                    /* Empty Slot Indicator with glowing neon border */
+                    <button
+                      onClick={() => openSlotSelector(slot.positionId)}
+                      className="w-14 h-20 border-2 border-dashed border-emerald-500/20 hover:border-emerald-400 bg-emerald-950/20 rounded-xl flex flex-col items-center justify-center p-2 cursor-pointer transition duration-300 hover:scale-105 group"
+                    >
+                      <span className="text-[10px] font-black text-emerald-400 group-hover:text-emerald-300 tracking-tighter select-none">
+                        {posDetails.label}
+                      </span>
+                      <span className="text-[20px] font-bold text-emerald-500/50 group-hover:text-emerald-300 leading-none mt-1 select-none">
+                        +
+                      </span>
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 

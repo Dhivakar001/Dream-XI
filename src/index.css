@@ -9,6 +9,22 @@
   --font-outfit: "Outfit", sans-serif;
 }
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  background-color: #050408;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(-1deg); }
   50% { transform: translateY(-12px) rotate(2deg); }
