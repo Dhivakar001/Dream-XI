@@ -240,19 +240,22 @@ This multi-process step triggers:
 - Client bundle: Packages optimized browser-side index assets to `/dist`.
 - Backend compile: Bundles `server.ts` into an optimized CommonJS bundle at `dist/server.cjs` via `esbuild`.
 
-### 2. Standalone Container Packaging
-Deploy easily using the standard serverless container recipe below:
-```dockerfile
-FROM node:20-slim
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-ENV NODE_ENV=production
-EXPOSE 3000
-CMD ["npm", "start"]
-```
+### 3. Deploying to Netlify
+The repository includes pre-configured Netlify configuration files (`netlify.toml` and `public/_redirects`):
+
+1. **Connect Repository to Netlify**:
+   - Push your code to GitHub / GitLab / Bitbucket.
+   - In Netlify, click **Add new site** > **Import an existing project**.
+   - Select your repository.
+
+2. **Build Settings** (automatically picked up from `netlify.toml`):
+   - **Build command**: `npm run build`
+   - **Publish directory**: `dist`
+   - **Functions / SPA Redirects**: Pre-configured via `public/_redirects` (`/* /index.html 200`).
+
+3. **Environment Variables**:
+   - In Netlify under **Site settings** > **Environment variables**, set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` if using custom Supabase credentials.
+
 
 ---
 
