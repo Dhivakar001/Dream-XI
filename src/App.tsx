@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 
 import { Player, Squad, Battle, SocialPost, UserProfile } from './types';
+import { PLAYERS_DB } from './playersData';
 import { playFutSound } from './utils';
 
 // Import Auth hooks
@@ -110,6 +111,119 @@ const HERO_SHOWCASE_PLAYERS: Player[] = [
     auraRating: 98,
     avatarSeed: 'ronaldinho',
     stats: { pac: 94, sho: 89, pas: 91, dri: 97, def: 38, phy: 81 }
+  }
+];
+
+const FALLBACK_PROFILE: UserProfile = {
+  id: 'u-user',
+  username: 'Gaffer_XI',
+  email: 'ppssdhivakar@gmail.com',
+  favoriteClub: 'Real Madrid',
+  winRate: 74,
+  footballIQ: 142,
+  followers: 842,
+  following: 195,
+  badges: ['Aura Master', 'Tactical Elite', 'Sim Specialist'],
+  squadsCount: 2,
+  bio: 'Tactician. Builder of elite chemistry hybrids.',
+};
+
+const FALLBACK_SQUADS: Squad[] = [
+  {
+    id: 's-samba',
+    name: 'Samba Kings XI',
+    userId: 'u-pele',
+    userName: 'Kinger_99',
+    formation: '4-3-3',
+    likes: 312,
+    likedBy: [],
+    chemistry: 100,
+    rating: 97,
+    isPublic: true,
+    description: 'The ultimate Brazilian samba lineup of legends and superstars.',
+    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+    auraScore: 98,
+    slots: [
+      { positionId: 'GK', player: PLAYERS_DB.find(p => p.id === 'p31') || null },
+      { positionId: 'LB', player: PLAYERS_DB.find(p => p.id === 'p24') || null },
+      { positionId: 'LCB', player: PLAYERS_DB.find(p => p.id === 'p22') || null },
+      { positionId: 'RCB', player: PLAYERS_DB.find(p => p.id === 'p23') || null },
+      { positionId: 'RB', player: PLAYERS_DB.find(p => p.id === 'p29') || null },
+      { positionId: 'LCM', player: PLAYERS_DB.find(p => p.id === 'p20') || null },
+      { positionId: 'RCM', player: PLAYERS_DB.find(p => p.id === 'p14') || null },
+      { positionId: 'CAM', player: PLAYERS_DB.find(p => p.id === 'p15') || null },
+      { positionId: 'LW', player: PLAYERS_DB.find(p => p.id === 'p7') || null },
+      { positionId: 'RW', player: PLAYERS_DB.find(p => p.id === 'p1') || null },
+      { positionId: 'ST', player: PLAYERS_DB.find(p => p.id === 'p5') || null }
+    ]
+  },
+  {
+    id: 's-galacticos',
+    name: 'Galacticos Hybrid',
+    userId: 'u-gaffer',
+    userName: 'Gaffer_XI',
+    formation: '4-3-3',
+    likes: 192,
+    likedBy: [],
+    chemistry: 95,
+    rating: 94,
+    isPublic: true,
+    description: 'Combining speed and clinical midfield control.',
+    createdAt: new Date().toISOString(),
+    auraScore: 96,
+    slots: [
+      { positionId: 'GK', player: PLAYERS_DB.find(p => p.id === 'p30') || null },
+      { positionId: 'LB', player: PLAYERS_DB.find(p => p.id === 'p27') || null },
+      { positionId: 'LCB', player: PLAYERS_DB.find(p => p.id === 'p26') || null },
+      { positionId: 'RCB', player: PLAYERS_DB.find(p => p.id === 'p23') || null },
+      { positionId: 'RB', player: PLAYERS_DB.find(p => p.id === 'p28') || null },
+      { positionId: 'LCM', player: PLAYERS_DB.find(p => p.id === 'p19') || null },
+      { positionId: 'RCM', player: PLAYERS_DB.find(p => p.id === 'p14') || null },
+      { positionId: 'CAM', player: PLAYERS_DB.find(p => p.id === 'p16') || null },
+      { positionId: 'LW', player: PLAYERS_DB.find(p => p.id === 'p9') || null },
+      { positionId: 'RW', player: PLAYERS_DB.find(p => p.id === 'p10') || null },
+      { positionId: 'ST', player: PLAYERS_DB.find(p => p.id === 'p3') || null }
+    ]
+  }
+];
+
+const FALLBACK_BATTLES: Battle[] = [
+  {
+    id: 'b-legendary',
+    squadA: FALLBACK_SQUADS[0],
+    squadB: FALLBACK_SQUADS[1],
+    votesA: 345,
+    votesB: 289,
+    votedUserIds: [],
+    createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
+    concluded: false,
+    commentsCount: 3
+  }
+];
+
+const FALLBACK_FEED: SocialPost[] = [
+  {
+    id: 'post-1',
+    userId: 'u-antony-king',
+    userName: 'Spin_Maestro_Antony',
+    userBio: 'Certified football theorist, Antony enthusiast.',
+    text: 'Some gaffers say Antony has only 1 goal in 20 matches. I say Antony has completed 360° rotational force vectors in mid-air, defeating Isaac Newton. Who is the real winner? 👑🌀',
+    likes: 412,
+    likedBy: [],
+    commentsCount: 21,
+    createdAt: new Date(Date.now() - 3600000).toISOString()
+  },
+  {
+    id: 'post-2',
+    userId: 'u-user',
+    userName: 'Gaffer_XI',
+    userBio: 'Tactician. Builder of elite chemistry hybrids.',
+    text: 'Just assembled this Galacticos Hybrid squad with 95 Chemistry! Check this defense and midfield synergy.',
+    squad: FALLBACK_SQUADS[1],
+    likes: 84,
+    likedBy: [],
+    commentsCount: 2,
+    createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
   }
 ];
 
@@ -244,90 +358,99 @@ export default function App() {
     };
   }, []);
 
-  // Load all telemetry endpoints concurrently on startup
+  // Load telemetry endpoints with resilient fallback
   useEffect(() => {
     let ignore = false;
     const loadInitialData = async () => {
       setLoading(true);
       setError(null);
-      let attempts = 0;
-      const maxAttempts = 6;
-      let delay = 1000;
 
-      while (attempts < maxAttempts) {
-        try {
-          if (ignore) return;
-          const [resPlayers, resSquads, resBattles, resFeed, resProfile] = await Promise.all([
-            fetch('/api/players'),
-            fetch('/api/squads'),
-            fetch('/api/battles'),
-            fetch('/api/feed'),
-            fetch('/api/profile'),
-          ]);
+      try {
+        const [resPlayers, resSquads, resBattles, resFeed, resProfile] = await Promise.all([
+          fetch('/api/players').catch(() => null),
+          fetch('/api/squads').catch(() => null),
+          fetch('/api/battles').catch(() => null),
+          fetch('/api/feed').catch(() => null),
+          fetch('/api/profile').catch(() => null),
+        ]);
 
-          if (!resPlayers.ok || !resSquads.ok || !resBattles.ok || !resFeed.ok || !resProfile.ok) {
-            throw new Error(`Non-ok API response received (Players: ${resPlayers.status}, Squads: ${resSquads.status}, Battles: ${resBattles.status})`);
-          }
+        if (ignore) return;
 
-          if (ignore) return;
+        let players: Player[] = PLAYERS_DB;
+        let squads: Squad[] = FALLBACK_SQUADS;
+        let battlesList: Battle[] = FALLBACK_BATTLES;
+        let feed: SocialPost[] = FALLBACK_FEED;
+        let userProfile: UserProfile = FALLBACK_PROFILE;
 
-          const [players, squads, battlesList, feed, userProfile] = await Promise.all([
-            resPlayers.json(),
-            resSquads.json(),
-            resBattles.json(),
-            resFeed.json(),
-            resProfile.json(),
-          ]);
+        if (resPlayers?.ok) {
+          try {
+            const data = await resPlayers.json();
+            if (Array.isArray(data) && data.length > 0) players = data;
+          } catch {}
+        }
+        if (resSquads?.ok) {
+          try {
+            const data = await resSquads.json();
+            if (Array.isArray(data)) squads = data;
+          } catch {}
+        }
+        if (resBattles?.ok) {
+          try {
+            const data = await resBattles.json();
+            if (Array.isArray(data)) battlesList = data;
+          } catch {}
+        }
+        if (resFeed?.ok) {
+          try {
+            const data = await resFeed.json();
+            if (Array.isArray(data)) feed = data;
+          } catch {}
+        }
+        if (resProfile?.ok) {
+          try {
+            const data = await resProfile.json();
+            if (data && data.username) userProfile = data;
+          } catch {}
+        }
 
-          if (ignore) return;
+        setAvailablePlayers(players);
 
-          setAvailablePlayers(players);
-          
-          if (user) {
-            try {
-              const cloudSquads = await loadSquadsFromCloud(user.id);
-              if (ignore) return;
-              const mergedSquads = [
-                ...cloudSquads,
-                ...squads.filter((s: Squad) => !cloudSquads.some(cs => cs.id === s.id))
-              ];
-              setSquadsList(mergedSquads);
-            } catch (cloudErr) {
-              console.warn('Could not integrate cloud squads, using seed squads:', cloudErr);
-              if (ignore) return;
-              setSquadsList(squads);
-            }
-          } else {
+        if (user) {
+          try {
+            const cloudSquads = await loadSquadsFromCloud(user.id);
+            if (ignore) return;
+            const mergedSquads = [
+              ...cloudSquads,
+              ...squads.filter((s: Squad) => !cloudSquads.some(cs => cs.id === s.id))
+            ];
+            setSquadsList(mergedSquads);
+          } catch (cloudErr) {
+            console.warn('Could not integrate cloud squads, using seed squads:', cloudErr);
+            if (ignore) return;
             setSquadsList(squads);
           }
-
-          setBattles(battlesList);
-          setFeedPosts(feed);
-          if (authProfile) {
-            setProfile(authProfile);
-          } else {
-            setProfile(userProfile);
-          }
-          
-          setError(null);
-          break; // Successfully booted all endpoints!
-        } catch (err) {
-          attempts++;
-          console.warn(`[Dream XI System] Telemetry boot attempt ${attempts}/${maxAttempts} failed:`, err);
-          if (attempts >= maxAttempts) {
-            if (!ignore) {
-              setError(`Could not establish connection with tactical database server. Make sure dev server is run on port 3000.`);
-            }
-          } else {
-            // Exponential backoff
-            await new Promise((resolve) => setTimeout(resolve, delay));
-            delay *= 1.5;
-          }
+        } else {
+          setSquadsList(squads);
         }
-      }
 
-      if (!ignore) {
-        setLoading(false);
+        setBattles(battlesList);
+        setFeedPosts(feed);
+        setProfile(authProfile || userProfile);
+        setError(null);
+      } catch (err) {
+        console.warn('Boot initialization fallback used:', err);
+        if (!ignore) {
+          setAvailablePlayers(PLAYERS_DB);
+          setSquadsList(FALLBACK_SQUADS);
+          setBattles(FALLBACK_BATTLES);
+          setFeedPosts(FALLBACK_FEED);
+          setProfile(authProfile || FALLBACK_PROFILE);
+          setError(null);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
       }
     };
 
